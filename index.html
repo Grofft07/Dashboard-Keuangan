@@ -154,7 +154,7 @@ td.r,th.r{text-align:right}
     <div class="card form"><label>Bulan<input type="month" id="sbBln"></label><label>Agensi<select id="gAg-awal"></select></label><span class="note">Kosongkan kolom patokan untuk memakai hitungan otomatis.</span></div>
     <div class="note" id="gInfo-awal" style="margin-top:10px"></div>
     <div class="ts"><table><thead id="gHead-awal"></thead><tbody id="gBody-awal"></tbody></table></div>
-    <div class="bar" style="margin:12px 0"><button class="btn" data-gsave="awal">💾 Simpan Patokan</button><span class="note">Nominal boleh singkat: 500rb, 2,5jt. Enter = baris berikutnya.</span></div>
+    <div class="bar" style="margin:12px 0"><button class="btn" data-gsave="awal">💾 Simpan Patokan</button><span class="note">Nominal boleh singkat: 500rb, 2,5jt. Saldo minus boleh: tulis -500rb atau (500rb). Enter = baris berikutnya.</span></div>
     <div class="card form" style="margin-top:12px"><button class="btn sec" id="sbAuto">⚡ Buat patokan bulan terpilih dari saldo akhir bulan lalu (semua agensi &amp; akun)</button><span class="note">Mengunci saldo awal bulan itu = hasil hitung sampai akhir bulan sebelumnya. Patokan yang sudah ada tidak ditimpa.</span></div>
     <h2>Saldo Awal Bulan Terpilih</h2><div class="ts"><table><thead><tr><th>Jenis</th><th>Nama</th><th class="r">Saldo Awal</th><th>Sumber</th></tr></thead><tbody id="tSbView"></tbody></table></div>
     <h2>Daftar Patokan Tersimpan</h2><div class="ts"><table><thead><tr><th>Bulan</th><th>Jenis</th><th>Nama</th><th class="r">Saldo Awal</th><th></th></tr></thead><tbody id="tSb"></tbody></table></div>
@@ -338,6 +338,7 @@ function buildReport(){
 /* ---------- aksi ---------- */
 function parseRp(s){s=String(s==null?'':s).toLowerCase().replace(/rp/g,'').replace(/\s/g,'');if(!s)return 0;const m=s.match(/^([\d.,]+)(jt|juta|rb|ribu|k)?$/);if(!m)return 0;let n;if(m[2]){n=parseFloat(m[1].replace(',','.'))||0;n*=(m[2]==='jt'||m[2]==='juta')?1e6:1e3}else n=parseFloat(m[1].replace(/[.,]/g,''))||0;return Math.round(n)}
 const num=id=>parseRp($(id).value);
+function parseRpN(s){const t=String(s==null?'':s).toLowerCase().replace(/rp/g,'').replace(/\s/g,'');const neg=/^[-\u2212\u2013]/.test(t)||/^\(.*\)$/.test(t);return (neg?-1:1)*parseRp(t.replace(/^[-\u2212\u2013(]+/,'').replace(/\)$/,''))}
 document.addEventListener('click',async e=>{
   const t=e.target.closest('[data-p],[data-deltp],[data-delsp],[data-delag],[data-delak],[data-delsb],[data-ppnag],[data-delpl],[data-aktab],[data-akmode]');if(!t)return;
   const d=t.dataset;
@@ -420,7 +421,7 @@ async function gridSave(kind,q){
     const by={};os.forEach(o=>{const a=D.akun.find(x=>same(x.nama,o.akun));if(a)by[a.agensi]=(by[a.agensi]||0)+o.nominal});
     const over=Object.keys(by).filter(g=>by[g]>balAt('agensi',g,addDay(iso(new Date()),1)));
     if(os.length&&over.length&&!confirm('Saldo agensi '+over.join(', ')+' tidak cukup untuk total top up ini. Tetap simpan?'))return 'cancel';D.tpakun.push(...os)}
-  else{type='saldoawal';rows.forEach(r=>{const i=r.querySelector('.gi');if(!i.value.trim())return;const v=parseRp(i.value);if(i.dataset.orig!==''&&v===+i.dataset.orig)return;os.push({bulan:t,jenis:r.dataset.j,nama:r.dataset.k,nominal:v})});
+  else{type='saldoawal';rows.forEach(r=>{const i=r.querySelector('.gi');if(!i.value.trim())return;const v=parseRpN(i.value);if(i.dataset.orig!==''&&v===+i.dataset.orig)return;os.push({bulan:t,jenis:r.dataset.j,nama:r.dataset.k,nominal:v})});
     os.forEach(o=>{D.saldoawal=D.saldoawal.filter(x=>!(x.bulan.slice(0,10)===o.bulan&&x.jenis===o.jenis&&same(x.nama,o.nama)));D.saldoawal.push(o)})}
   if(!os.length){if(!q)toast('Tidak ada yang diisi atau berubah');return 'none'}
   save();const ps=os.map(o=>push(type,o));
@@ -441,7 +442,7 @@ $('#gTgl-akun').onchange=()=>{renderGrid('topup');renderGrid('spend')};
 $('#gAg-akun').onchange=()=>{agFilter('topup');agFilter('spend')};$('#gAg-awal').onchange=()=>agFilter('awal');
 document.addEventListener('input',e=>{const t=e.target;if(!t.classList||!t.classList.contains('gi')||!t.closest('#gBody-spend'))return;const r=t.closest('tr'),v=parseRp(t.value);r.querySelector('[data-pot]').textContent=v?rp(Math.round(v*(1+(+r.dataset.ppn||0)/100))):'-'});
 document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('gi'))e.target.select()});
-document.addEventListener('focusout',e=>{const t=e.target;if(t.matches&&t.matches('[data-money]')&&t.value.trim()){const v=parseRp(t.value);if(v>0)t.value=fmtN(v)}});
+document.addEventListener('focusout',e=>{const t=e.target;if(t.matches&&t.matches('[data-money]')&&t.value.trim()){const aw=!!t.closest('#gBody-awal'),v=aw?parseRpN(t.value):parseRp(t.value);if(v>0||(aw&&v<0))t.value=fmtN(v)}});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target;
   if(t.classList&&t.classList.contains('gi')){e.preventDefault();const all=[...t.closest('tbody').querySelectorAll('.gi')].filter(i=>i.closest('tr').style.display!=='none'),n=all[all.indexOf(t)+1];(n||t.closest('.ts').nextElementSibling.querySelector('[data-gsave]')).focus();return}
   const f=t.closest&&t.closest('.card.form');if(f&&t.tagName==='INPUT'){const b=f.querySelector('.btn:not(.sec)');if(b){e.preventDefault();b.click()}}});
