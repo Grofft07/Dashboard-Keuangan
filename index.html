@@ -51,6 +51,10 @@ td.r,th.r{text-align:right}
 .ac{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
 .ac .h{display:flex;justify-content:space-between;align-items:center;font-weight:700;padding-bottom:10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
 .ac .row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}.ac .row span:first-child{color:var(--muted)}.ac .row b{font-weight:600}
+.ptabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-top:14px}
+.ptab{background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font:inherit;font-weight:600;font-size:14px;padding:10px 16px;margin-bottom:-1px;cursor:pointer}
+.ptab:hover{color:var(--text)}.ptab.on{color:var(--green);border-bottom-color:var(--green)}
+.akpane{display:none}.akpane.on{display:block}
 .stabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
 .stab{display:inline-flex;align-items:center;gap:7px;background:var(--panel-2);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;font-weight:500;cursor:pointer}
 .stab:hover{color:var(--text)}
@@ -110,7 +114,13 @@ td.r,th.r{text-align:right}
 
   <div class="page" id="p-akun">
     <h1>Akun Iklan &amp; Sisa Saldo</h1><div class="note">Top up saldo ke akun iklan, catat spend, dan pantau sisa saldo</div>
+    <div class="ptabs"><button class="ptab" data-akmode="sum">📊 Ringkasan Saldo</button><button class="ptab" data-akmode="in">✏️ Input &amp; Riwayat</button></div>
+    <div class="akpane" id="akp-sum">
     <h2>Sisa Saldo per Akun</h2><div class="stabs" id="akTabs"></div><div class="note" id="akSum" style="margin-top:10px"></div><div class="cards" id="akCards"></div>
+    <h2>Kelola Akun Iklan</h2>
+    <div class="card form"><label>Nama akun<input id="akNew"></label><label>Milik agensi<select id="akAg"></select></label><button class="btn" id="akAdd">+ Tambah Akun</button></div>
+    </div>
+    <div class="akpane" id="akp-in">
     <h2>Top Up &amp; Spend Harian</h2>
     <div class="card form"><label>Tanggal<input type="date" id="gTgl-akun"></label><label>Agensi<select id="gAg-akun"></select></label><button class="btn sec" data-gd="akun:0">Hari ini</button><button class="btn sec" data-gd="akun:-1">Kemarin</button><span class="note">Kiri: top up ke akun. Kanan: spend sebelum PPN (PPN dihitung otomatis per agensi).</span></div>
     <div class="two">
@@ -118,10 +128,9 @@ td.r,th.r{text-align:right}
       <div><h3>Catat Spend Harian</h3><div class="note" id="gInfo-spend"></div><div class="ts"><table><thead id="gHead-spend"></thead><tbody id="gBody-spend"></tbody></table></div></div>
     </div>
     <div class="bar" style="margin-top:12px"><button class="btn" data-gsave="akun">💾 Simpan Top Up &amp; Spend</button><span class="note">Baris kosong / tidak berubah dilewati. Nominal boleh singkat: 500rb, 2,5jt. Enter = baris berikutnya.</span></div>
-    <h2>Kelola Akun Iklan</h2>
-    <div class="card form"><label>Nama akun<input id="akNew"></label><label>Milik agensi<select id="akAg"></select></label><button class="btn" id="akAdd">+ Tambah Akun</button></div>
     <h2>Riwayat Top Up ke Akun</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Akun</th><th class="r">Nominal</th><th>Catatan</th><th></th></tr></thead><tbody id="tTk"></tbody></table></div>
     <h2>Riwayat Spend</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Akun</th><th class="r">Spend</th><th class="r">PPN</th><th class="r">Spend + PPN</th><th></th></tr></thead><tbody id="tSp"></tbody></table></div>
+    </div>
   </div>
 
   <div class="page" id="p-hutang">
@@ -259,8 +268,13 @@ function fillSel(){
   ['akun','awal'].forEach(k=>{const s=$('#gAg-'+k),c=s.value;s.innerHTML='<option value="">Semua agensi</option>'+o(ag);s.value=c});
   const cur=$('#lpAg').value;$('#lpAg').innerHTML='<option value="">Semua agensi</option>'+o(ag);$('#lpAg').value=cur;
 }
+let akMode='sum';try{akMode=localStorage.getItem('saldoIklanAkMode')||'sum'}catch(e){}
+function setAkMode(m){akMode=m==='in'?'in':'sum';try{localStorage.setItem('saldoIklanAkMode',akMode)}catch(e){}
+  $$('.ptab').forEach(b=>b.classList.toggle('on',b.dataset.akmode===akMode));
+  $('#akp-sum').classList.toggle('on',akMode==='sum');$('#akp-in').classList.toggle('on',akMode==='in')}
 let akTab='__all';try{akTab=localStorage.getItem('saldoIklanAkTab')||'__all'}catch(e){}
 function renderAkCards(){
+  setAkMode(akMode);
   const lvOf=x=>x.sisa<=0?['bad','Habis']:x.sisa<minS()?['warn','Menipis']:['ok','Aman'];
   const rows=D.akun.map(a=>({a,s:akStat(a)}));
   const names=[];D.agensi.forEach(g=>{if(!names.some(n=>same(n,g.nama)))names.push(g.nama)});
@@ -325,8 +339,9 @@ function buildReport(){
 function parseRp(s){s=String(s==null?'':s).toLowerCase().replace(/rp/g,'').replace(/\s/g,'');if(!s)return 0;const m=s.match(/^([\d.,]+)(jt|juta|rb|ribu|k)?$/);if(!m)return 0;let n;if(m[2]){n=parseFloat(m[1].replace(',','.'))||0;n*=(m[2]==='jt'||m[2]==='juta')?1e6:1e3}else n=parseFloat(m[1].replace(/[.,]/g,''))||0;return Math.round(n)}
 const num=id=>parseRp($(id).value);
 document.addEventListener('click',async e=>{
-  const t=e.target.closest('[data-p],[data-deltp],[data-delsp],[data-delag],[data-delak],[data-delsb],[data-ppnag],[data-delpl],[data-aktab]');if(!t)return;
+  const t=e.target.closest('[data-p],[data-deltp],[data-delsp],[data-delag],[data-delak],[data-delsb],[data-ppnag],[data-delpl],[data-aktab],[data-akmode]');if(!t)return;
   const d=t.dataset;
+  if(d.akmode){setAkMode(d.akmode);return}
   if(d.aktab!==undefined){akTab=d.aktab;try{localStorage.setItem('saldoIklanAkTab',akTab)}catch(e){}renderAkCards();return}
   if(d.p){$$('.nav').forEach(n=>n.classList.toggle('on',n===t));$$('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+d.p));if(d.p==='akun'||d.p==='saldo')renderGrid();return}
   e.preventDefault();
