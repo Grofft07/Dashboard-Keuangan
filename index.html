@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Saldo Iklan</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#0F1115;--panel:#171B22;--panel-2:#1D222B;--line:#2A3040;--text:#E7E9EE;--muted:#8B93A7;--green:#22C55E;--greendark:#15803D;--yellow:#F5C518;--red:#EF4444;--blue:#38BDF8;--purple:#A78BFA;--th:#0B0F14;--kpi:linear-gradient(135deg,#0E3B26,#1D9A5C);color-scheme:dark}
+:root[data-theme=light]{--bg:#F4F8F6;--panel:#fff;--panel-2:#EEF6F1;--line:#DCE7E1;--text:#12161C;--muted:#5B6577;--green:#16A34A;--greendark:#166534;--yellow:#B8860B;--red:#D7384F;--blue:#2B6FE0;--purple:#7A56E0;--th:#fff;color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:15px/1.6 'Roboto',sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.app{display:flex;min-height:100vh}
+.sidebar{width:220px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 22px}
+.brand i{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.brand b{font-size:15px;letter-spacing:.3px}
+.nav{display:flex;gap:10px;padding:10px 12px;border-radius:8px;color:var(--muted);cursor:pointer;font-size:14px;font-weight:500;border:1px solid transparent;user-select:none}
+.nav:hover{background:var(--panel-2);color:var(--text)}
+.nav.on{background:var(--greendark);color:#EAFFF2;border-color:var(--green)}
+.foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
+.foot i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.foot.ok i{background:var(--green)}.foot.err i{background:var(--red)}.foot.sim i{background:var(--yellow)}
+.main{flex:1;padding:24px 30px 50px;min-width:0;max-width:1500px}
+.top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:18px}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.page{display:none}.page.on{display:block}
+h1{font-size:24px}h2{font-size:18px;margin:26px 0 12px}
+.note{font-size:12.5px;color:var(--muted)}
+input,select,textarea{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:8px 10px;font:13px 'Roboto',sans-serif}
+textarea{width:100%;min-height:260px;line-height:1.6}
+.btn{background:var(--green);color:#06150E;border:none;border-radius:8px;padding:9px 16px;font-weight:700;font-size:12.5px;cursor:pointer}
+.btn.sec{background:var(--panel-2);color:var(--text);border:1px solid var(--line)}
+.btn.wa{background:#25D366;color:#fff}.btn.del{background:none;color:var(--red);padding:4px 8px;border:1px solid var(--line)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.kpi{background:var(--kpi);border:none;color:#F2FBF6}
+.kpi .l{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;opacity:.75}
+.kpi .v{font-size:23px;font-weight:700;margin-top:8px}
+.form{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;font-weight:600;color:var(--muted)}
+.ts{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+th{text-align:left;color:var(--th);font-size:11.5px;text-transform:uppercase;padding:11px 12px;background:linear-gradient(180deg,var(--green),var(--greendark));white-space:nowrap}
+td{padding:9px 12px;border-top:1px solid var(--line)}tr:nth-child(odd) td{background:rgba(127,127,127,.04)}
+td.r,th.r{text-align:right}
+.tag{font-size:11.5px;padding:3px 9px;border-radius:12px;font-weight:600}
+.ok{background:rgba(34,197,94,.15);color:var(--green)}.warn{background:rgba(245,197,24,.15);color:var(--yellow)}.bad{background:rgba(239,68,68,.15);color:var(--red)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:10px}
+.ac{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.ac .h{display:flex;justify-content:space-between;align-items:center;font-weight:700;padding-bottom:10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.ac .row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}.ac .row span:first-child{color:var(--muted)}.ac .row b{font-weight:600}
+.chartbox{position:relative;height:280px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);padding:10px 18px;border-radius:9px;font-size:13px;display:none;z-index:9}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-top:6px}.two h3{font-size:15px;margin:10px 0 4px}.two table{min-width:0;font-size:12.5px}.two th,.two td{padding:8px 8px}.two .gi{width:105px !important}.two .gc{min-width:90px !important}@media(max-width:1150px){.two{grid-template-columns:1fr}}
+@media(max-width:760px){.app{flex-direction:column}.sidebar{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;padding:10px}.brand,.foot{display:none}.main{padding:16px}}
+</style>
+<script>try{if(localStorage.getItem('saldoTheme')!=='dark')document.documentElement.setAttribute('data-theme','light')}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
+</head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="brand"><i></i><b>SALDO IKLAN</b></div>
+  <div class="nav on" data-p="overview">◧ Overview</div>
+  <div class="nav" data-p="agensi">▤ Top Up Agensi</div>
+  <div class="nav" data-p="akun">▥ Akun Iklan &amp; Sisa Saldo</div>
+  <div class="nav" data-p="hutang">⇄ Hutang &amp; Titipan</div>
+  <div class="nav" data-p="saldo">◔ Saldo Awal Bulanan</div>
+  <div class="nav" data-p="laporan">🗒️ Laporan WhatsApp</div>
+  <div class="nav" data-p="integrasi">⚙ Integrasi</div>
+  <div class="foot sim" id="st"><i></i><span id="stT">Mode lokal</span></div>
+</div>
+<div class="main">
+  <div class="top">
+    <div class="bar"><span class="note">Periode</span><input type="date" id="dFrom"><span class="note">s/d</span><input type="date" id="dTo"></div>
+    <div class="bar"><button class="btn sec" id="bRefresh" title="Tarik data terbaru">⟳</button><button class="btn sec" id="bTheme" title="Ganti tema">🌙/☀️</button></div>
+  </div>
+
+  <div class="page on" id="p-overview">
+    <h1>Overview</h1><div class="note">Ringkasan top up &amp; sisa saldo iklan — top up/spend mengikuti periode, saldo selalu kumulatif</div>
+    <h2>Ringkasan</h2><div class="grid" id="kpis"></div>
+    <h2>Top Up vs Spend per Agensi</h2><div class="card"><div class="chartbox"><canvas id="ch"></canvas></div></div>
+    <h2>Saldo per Agensi</h2><div class="ts"><table><thead><tr><th>Agensi</th><th class="r">Saldo Awal Agensi</th><th class="r">Top Up Agensi</th><th class="r">Dialokasi ke Akun</th><th class="r">Saldo Akhir Agensi</th><th class="r">Saldo Awal Akun</th><th class="r">Spend + PPN</th><th class="r">Sisa Saldo Akun</th></tr></thead><tbody id="tAg"></tbody></table></div>
+  </div>
+
+  <div class="page" id="p-agensi">
+    <h1>Top Up Agensi</h1><div class="note">Catat setoran saldo iklan ke setiap agensi</div>
+    <h2>Catat Top Up</h2>
+    <div class="card form">
+      <label>Tanggal<input type="date" id="taTgl"></label>
+      <label>Agensi<select id="taAg"></select></label>
+      <label>Nominal (Rp)<input data-money inputmode="decimal" id="taNom" placeholder="mis. 5jt" style="width:130px"></label>
+      <label>Status<select id="taSt"><option value="lunas">Lunas</option><option value="hutang">Hutang</option><option value="titip">Titip</option></select></label>
+      <label>Pihak (hutang/titip)<input id="taPh" placeholder="Nama pemberi/penitip" style="width:170px"></label>
+      <label style="flex:1;min-width:160px">Catatan<input id="taCat" placeholder="Opsional"></label>
+      <button class="btn" id="taSave">Simpan Top Up</button>
+    </div>
+    <h2>Kelola Agensi</h2>
+    <div class="card form"><label>Nama agensi baru<input id="agNew" placeholder="mis. Agensi A"></label><label>PPN agensi (%)<input type="number" id="agPpn" min="0" step="0.1" value="0" style="width:110px"></label><button class="btn" id="agAdd">+ Tambah</button><div id="agList" class="bar"></div></div>
+    <h2>Riwayat Top Up Agensi</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Agensi</th><th class="r">Nominal</th><th>Status</th><th>Catatan</th><th></th></tr></thead><tbody id="tTa"></tbody></table></div>
+  </div>
+
+  <div class="page" id="p-akun">
+    <h1>Akun Iklan &amp; Sisa Saldo</h1><div class="note">Top up saldo ke akun iklan, catat spend, dan pantau sisa saldo</div>
+    <h2>Sisa Saldo per Akun</h2><div class="cards" id="akCards"></div>
+    <h2>Top Up &amp; Spend Harian</h2>
+    <div class="card form"><label>Tanggal<input type="date" id="gTgl-akun"></label><label>Agensi<select id="gAg-akun"></select></label><button class="btn sec" data-gd="akun:0">Hari ini</button><button class="btn sec" data-gd="akun:-1">Kemarin</button><span class="note">Kiri: top up ke akun. Kanan: spend sebelum PPN (PPN dihitung otomatis per agensi).</span></div>
+    <div class="two">
+      <div><h3>Top Up ke Akun Iklan</h3><div class="note" id="gInfo-topup"></div><div class="ts"><table><thead id="gHead-topup"></thead><tbody id="gBody-topup"></tbody></table></div></div>
+      <div><h3>Catat Spend Harian</h3><div class="note" id="gInfo-spend"></div><div class="ts"><table><thead id="gHead-spend"></thead><tbody id="gBody-spend"></tbody></table></div></div>
+    </div>
+    <div class="bar" style="margin-top:12px"><button class="btn" data-gsave="akun">💾 Simpan Top Up &amp; Spend</button><span class="note">Baris kosong / tidak berubah dilewati. Nominal boleh singkat: 500rb, 2,5jt. Enter = baris berikutnya.</span></div>
+    <h2>Kelola Akun Iklan</h2>
+    <div class="card form"><label>Nama akun<input id="akNew"></label><label>Milik agensi<select id="akAg"></select></label><button class="btn" id="akAdd">+ Tambah Akun</button></div>
+    <h2>Riwayat Top Up ke Akun</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Akun</th><th class="r">Nominal</th><th>Catatan</th><th></th></tr></thead><tbody id="tTk"></tbody></table></div>
+    <h2>Riwayat Spend</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Akun</th><th class="r">Spend</th><th class="r">PPN</th><th class="r">Spend + PPN</th><th></th></tr></thead><tbody id="tSp"></tbody></table></div>
+  </div>
+
+  <div class="page" id="p-hutang">
+    <h1>Hutang &amp; Titipan</h1><div class="note">Top up agensi berstatus <b>Hutang</b> (belum dibayar ke agensi) atau <b>Titip</b> (memakai dana pihak lain). Saldo iklan tetap bertambah; di sini dilacak sisa yang belum diselesaikan.</div>
+    <h2>Ringkasan</h2><div class="grid" id="htKpi"></div>
+    <h2>Catat Pelunasan / Penyelesaian</h2>
+    <div class="card form">
+      <label>Tanggal<input type="date" id="plTgl"></label>
+      <label>Top up<select id="plRef" style="min-width:260px"></select></label>
+      <label>Nominal (Rp)<input data-money inputmode="decimal" id="plNom" style="width:130px"></label>
+      <label style="flex:1;min-width:140px">Catatan<input id="plCat" placeholder="mis. transfer ke agensi / dikembalikan ke penitip"></label>
+      <button class="btn" id="plSave">Simpan</button>
+    </div>
+    <h2>Daftar Hutang &amp; Titipan</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Agensi</th><th>Status</th><th>Pihak</th><th class="r">Nominal</th><th class="r">Sudah Diselesaikan</th><th class="r">Sisa</th></tr></thead><tbody id="tHt"></tbody></table></div>
+    <h2>Riwayat Pelunasan</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Top up</th><th class="r">Nominal</th><th>Catatan</th><th></th></tr></thead><tbody id="tPl"></tbody></table></div>
+  </div>
+
+  <div class="page" id="p-saldo">
+    <h1>Saldo Awal Bulanan</h1><div class="note">Patokan saldo di awal tiap bulan, untuk agensi dan akun iklan. Tanpa patokan, saldo awal dihitung otomatis dari seluruh riwayat transaksi (mulai dari 0).</div>
+<h2>Isi Patokan Saldo Awal</h2>
+    <div class="card form"><label>Bulan<input type="month" id="sbBln"></label><label>Agensi<select id="gAg-awal"></select></label><span class="note">Kosongkan kolom patokan untuk memakai hitungan otomatis.</span></div>
+    <div class="note" id="gInfo-awal" style="margin-top:10px"></div>
+    <div class="ts"><table><thead id="gHead-awal"></thead><tbody id="gBody-awal"></tbody></table></div>
+    <div class="bar" style="margin:12px 0"><button class="btn" data-gsave="awal">💾 Simpan Patokan</button><span class="note">Nominal boleh singkat: 500rb, 2,5jt. Enter = baris berikutnya.</span></div>
+    <div class="card form" style="margin-top:12px"><button class="btn sec" id="sbAuto">⚡ Buat patokan bulan terpilih dari saldo akhir bulan lalu (semua agensi &amp; akun)</button><span class="note">Mengunci saldo awal bulan itu = hasil hitung sampai akhir bulan sebelumnya. Patokan yang sudah ada tidak ditimpa.</span></div>
+    <h2>Saldo Awal Bulan Terpilih</h2><div class="ts"><table><thead><tr><th>Jenis</th><th>Nama</th><th class="r">Saldo Awal</th><th>Sumber</th></tr></thead><tbody id="tSbView"></tbody></table></div>
+    <h2>Daftar Patokan Tersimpan</h2><div class="ts"><table><thead><tr><th>Bulan</th><th>Jenis</th><th>Nama</th><th class="r">Saldo Awal</th><th></th></tr></thead><tbody id="tSb"></tbody></table></div>
+  </div>
+
+  <div class="page" id="p-laporan">
+    <h1>Laporan WhatsApp</h1><div class="note">Susun rekap saldo, lalu kirim lewat WhatsApp — mengikuti periode di atas</div>
+    <div class="card form" style="margin-top:14px">
+      <label>Agensi<select id="lpAg"></select></label>
+      <label><span>Rincian akun</span><select id="lpDet"><option value="1">Tampilkan</option><option value="0">Ringkas saja</option></select></label>
+      <label>Nomor WA tujuan (62…)<input id="lpPhone" placeholder="628123456789"></label>
+    </div>
+    <div class="card" style="margin-top:14px"><textarea id="lpTxt"></textarea>
+      <div class="bar" style="margin-top:12px"><button class="btn wa" id="lpWa">Kirim via WhatsApp</button><button class="btn sec" id="lpCopy">📋 Salin Teks</button><button class="btn sec" id="lpReset">Susun Ulang</button></div></div>
+  </div>
+
+  <div class="page" id="p-integrasi">
+    <h1>Pengaturan Integrasi</h1><div class="note">Hubungkan ke Google Sheet via Apps Script (kode ada di file Code.gs)</div>
+    <div class="card" style="margin-top:14px">
+      <label class="note">URL Web App Apps Script</label>
+      <input id="url" style="width:100%;margin:6px 0 12px" placeholder="https://script.google.com/macros/s/XXXXX/exec">
+      <label class="note">Batas saldo menipis (Rp) — akun di bawah ini ditandai ⚠️</label>
+      <input type="number" id="minS" style="width:220px;margin:6px 0 14px;display:block">
+      <div class="bar"><button class="btn" id="bPull">Tarik Data dari Spreadsheet</button><button class="btn sec" id="bPush">Kirim Semua Data ke Spreadsheet</button><button class="btn sec" id="bShowScript">&lt;/&gt; Lihat Kode Apps Script</button></div>
+      <div class="note" id="syncMsg" style="margin-top:10px">Belum ada sinkronisasi.</div>
+      <div id="scriptBox" style="display:none;margin-top:16px">
+        <div class="note" style="margin-bottom:10px">
+          <b>Cara pasang:</b> buka Google Sheet → <b>Extensions → Apps Script</b> → hapus isi lama, tempel kode di bawah → <b>Deploy → New deployment → Web app</b> (Execute as: <b>Me</b>, Who has access: <b>Anyone</b>) → salin URL <code>/exec</code> ke kolom di atas.<br>
+          Sheet dibuat <b>otomatis</b> saat pertama dipakai: <code>Agensi</code>, <code>Akun</code>, <code>TopUpAgensi</code>, <code>TopUpAkun</code>, <code>SpendAkun</code>, <code>SaldoAwal</code>, <code>Pelunasan</code>. Setelah kode diperbarui, deploy ulang lewat <b>Manage deployments → Edit → New version</b>.
+        </div>
+        <pre id="scriptCode" style="background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:11px;line-height:1.6;overflow:auto;max-height:420px;color:var(--green)"></pre>
+        <button class="btn sec" id="bCopyScript" style="margin-top:10px">📋 Salin Kode</button>
+      </div>
+    </div>
+    <h2>Reset</h2><div class="card"><button class="btn" style="background:var(--red);color:#fff" id="bReset">🗑 Hapus Data Lokal Browser</button><div class="note" style="margin-top:8px">Data di Google Sheet tidak ikut terhapus.</div></div>
+  </div>
+</div>
+</div>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const K='saldoIklanV1';
+let D=JSON.parse(localStorage.getItem(K)||'null')||{agensi:[],akun:[],tpagensi:[],tpakun:[],spend:[],saldoawal:[],pelunasan:[]};D.saldoawal=D.saldoawal||[];D.pelunasan=D.pelunasan||[];
+let S=JSON.parse(localStorage.getItem(K+'s')||'{}');
+const rp=n=>'Rp '+Math.round(n||0).toLocaleString('id-ID');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const iso=d=>d.toLocaleDateString('sv-SE');
+const sum=(a,f)=>a.reduce((s,x)=>s+(+x[f]||0),0);
+const spv=x=>+x.spendppn||+x.spend||0;
+const sumSp=a=>a.reduce((s,x)=>s+spv(x),0);
+const ppnOf=ak=>{const a=D.akun.find(x=>same(x.nama,ak)),g=a&&D.agensi.find(x=>same(x.nama,a.agensi));return g?(+g.ppn||0):0};
+const sisaRef=x=>(+x.nominal||0)-sum(D.pelunasan.filter(p=>p.ref===x.id),'nominal');
+const outAmt=(st,g)=>D.tpagensi.filter(x=>x.status===st&&(!g||same(x.agensi,g))).reduce((s,x)=>s+Math.max(0,sisaRef(x)),0);
+const STL={lunas:'Lunas',hutang:'Hutang',titip:'Titip'},STC={lunas:'ok',hutang:'bad',titip:'warn'};
+const uid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const same=(a,b)=>String(a).trim().toLowerCase()===String(b).trim().toLowerCase();
+const minS=()=>+S.min||500000;
+let chart;
+function save(){localStorage.setItem(K,JSON.stringify(D));localStorage.setItem(K+'s',JSON.stringify(S))}
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2600)}
+function setSt(c,t){$('#st').className='foot '+c;$('#stT').textContent=t}
+const inP=t=>t>=$('#dFrom').value&&t<=$('#dTo').value;
+
+/* ---------- hitung ---------- */
+const addDay=(d,n)=>{const x=new Date(d+'T00:00:00');x.setDate(x.getDate()+n);return iso(x)};
+const rng=(t,a,b)=>t>=a&&t<b;
+function flow(kind,name,a,b){
+  if(kind==='akun')return sum(D.tpakun.filter(x=>same(x.akun,name)&&rng(x.tanggal,a,b)),'nominal')-sumSp(D.spend.filter(x=>same(x.akun,name)&&rng(x.tanggal,a,b)));
+  const aks=D.akun.filter(k=>same(k.agensi,name)).map(k=>k.nama);
+  return sum(D.tpagensi.filter(x=>same(x.agensi,name)&&rng(x.tanggal,a,b)),'nominal')-sum(D.tpakun.filter(x=>aks.some(n=>same(n,x.akun))&&rng(x.tanggal,a,b)),'nominal');
+}
+/* saldo di AWAL tanggal dt = patokan terakhir (<= dt) + transaksi sejak patokan itu */
+function anchor(kind,name,dt){return D.saldoawal.filter(x=>x.jenis===kind&&same(x.nama,name)&&x.bulan.slice(0,10)<=dt).sort((a,b)=>b.bulan.localeCompare(a.bulan))[0]}
+function balAt(kind,name,dt){const an=anchor(kind,name,dt);return (an?+an.nominal||0:0)+flow(kind,name,an?an.bulan.slice(0,10):'0000-00-00',dt)}
+function akStat(a){const f=$('#dFrom').value,e=addDay($('#dTo').value,1);
+  return {awal:balAt('akun',a.nama,f),sisa:balAt('akun',a.nama,e),
+    topP:sum(D.tpakun.filter(x=>same(x.akun,a.nama)&&inP(x.tanggal)),'nominal'),spdP:sumSp(D.spend.filter(x=>same(x.akun,a.nama)&&inP(x.tanggal)))}}
+function agStat(g){const f=$('#dFrom').value,e=addDay($('#dTo').value,1),aks=D.akun.filter(a=>same(a.agensi,g)),st=aks.map(akStat);
+  return {aks,depP:sum(D.tpagensi.filter(x=>same(x.agensi,g)&&inP(x.tanggal)),'nominal'),awalAg:balAt('agensi',g,f),saldo:balAt('agensi',g,e),
+    topAkP:st.reduce((s,x)=>s+x.topP,0),spdP:st.reduce((s,x)=>s+x.spdP,0),awalAk:st.reduce((s,x)=>s+x.awal,0),sisaAk:st.reduce((s,x)=>s+x.sisa,0)}}
+const agNames=()=>D.agensi.filter(g=>g.aktif!=='tidak').map(g=>g.nama);
+
+/* ---------- sync ---------- */
+async function push(type,o){
+  if(!S.url){setSt('sim','Mode lokal (belum terhubung)');return 'local'}
+  try{const r=await fetch(S.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({type,...o})});
+    const j=JSON.parse(await r.text());if(j.status!=='ok')throw new Error(j.message||'gagal');setSt('ok','Tersinkron');return 'ok'}
+  catch(e){setSt('err','Gagal kirim: '+e.message);return 'err'}
+}
+async function pull(quiet){
+  if(!S.url){if(!quiet)toast('Isi URL Apps Script dulu');return}
+  const m=$('#syncMsg');m.textContent='Menarik data…';
+  try{const t=(await (await fetch(S.url+'?action=read',{cache:'no-store'})).text()).trim();
+    if(t[0]==='<')throw new Error('Google membalas HTML — cek deployment: "Who has access" harus Anyone');
+    const j=JSON.parse(t);if(j.error)throw new Error(j.error);
+    ['agensi','akun','tpagensi','tpakun','spend','saldoawal','pelunasan'].forEach(k=>{if(Array.isArray(j[k]))D[k]=j[k]});
+    save();renderAll();renderGrid();setSt('ok','Tersinkron');m.textContent='✅ Data ditarik '+new Date().toLocaleTimeString('id-ID');
+  }catch(e){setSt('err','Gagal tarik');m.textContent='⚠️ '+e.message}
+}
+async function pushAll(){
+  const m=$('#syncMsg');let n=0,bad=0;
+  for(const k of Object.keys(D))for(const r of D[k]){m.textContent='Mengirim '+(++n)+'…';if(await push(k,r)==='err')bad++}
+  m.textContent=bad?'⚠️ '+bad+' baris gagal terkirim':'✅ '+n+' baris terkirim ke spreadsheet'
+}
+
+/* ---------- render ---------- */
+function fillSel(){
+  const ag=agNames(),ak=D.akun.filter(a=>a.aktif!=='tidak').map(a=>a.nama);
+  const o=a=>a.map(x=>`<option>${esc(x)}</option>`).join('');
+  $('#taAg').innerHTML=o(ag);$('#akAg').innerHTML=o(ag);
+  ['akun','awal'].forEach(k=>{const s=$('#gAg-'+k),c=s.value;s.innerHTML='<option value="">Semua agensi</option>'+o(ag);s.value=c});
+  const cur=$('#lpAg').value;$('#lpAg').innerHTML='<option value="">Semua agensi</option>'+o(ag);$('#lpAg').value=cur;
+}
+function renderAll(){
+  fillSel();
+  const ag=agNames(),st=ag.map(agStat);
+  const tot=k=>st.reduce((s,x)=>s+x[k],0);
+  $('#kpis').innerHTML=[['Saldo Awal Agensi',rp(tot('awalAg'))],['Saldo Awal Akun Iklan',rp(tot('awalAk'))],['Top Up Agensi (periode)',rp(tot('depP'))],['Top Up ke Akun (periode)',rp(tot('topAkP'))],['Spend + PPN (periode)',rp(tot('spdP'))],['Saldo Akhir Agensi',rp(tot('saldo'))],['Sisa Saldo Akun Iklan',rp(tot('sisaAk'))],['Hutang Belum Lunas',rp(outAmt('hutang'))],['Titipan Belum Selesai',rp(outAmt('titip'))]]
+    .map(x=>`<div class="card kpi"><div class="l">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
+  $('#tAg').innerHTML=ag.map((g,i)=>{const s=st[i];return `<tr><td><b>${esc(g)}</b></td><td class="r">${rp(s.awalAg)}</td><td class="r">${rp(s.depP)}</td><td class="r">${rp(s.topAkP)}</td><td class="r"><b>${rp(s.saldo)}</b></td><td class="r">${rp(s.awalAk)}</td><td class="r">${rp(s.spdP)}</td><td class="r"><b>${rp(s.sisaAk)}</b></td></tr>`}).join('')||'<tr><td colspan="8" class="note">Belum ada agensi — tambahkan di menu Top Up Agensi.</td></tr>';
+  if(chart)chart.destroy();
+  const cs=getComputedStyle(document.documentElement),tc=cs.getPropertyValue('--muted').trim(),gc=cs.getPropertyValue('--line').trim();
+  chart=new Chart($('#ch'),{type:'bar',data:{labels:ag,datasets:[{label:'Top Up Agensi',data:st.map(s=>s.depP),backgroundColor:'#22C55E'},{label:'Top Up ke Akun',data:st.map(s=>s.topAkP),backgroundColor:'#38BDF8'},{label:'Spend',data:st.map(s=>s.spdP),backgroundColor:'#A78BFA'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc}}},scales:{x:{ticks:{color:tc},grid:{color:gc}},y:{beginAtZero:true,suggestedMax:1000000,ticks:{color:tc,maxTicksLimit:6,callback:v=>v>=1e6?'Rp '+Number((v/1e6).toFixed(1))+' jt':v>=1e3?'Rp '+Math.round(v/1e3)+' rb':'Rp '+Math.round(v)},grid:{color:gc}}}}});
+  // agensi page
+  $('#agList').innerHTML=D.agensi.map(g=>`<span class="tag ${g.aktif==='tidak'?'warn':'ok'}">${esc(g.nama)} · PPN ${+g.ppn||0}% <a href="#" data-ppnag="${esc(g.nama)}" title="Ubah PPN" style="color:inherit;text-decoration:none">✎</a> <a href="#" data-delag="${esc(g.nama)}" style="color:inherit;text-decoration:none">✕</a></span>`).join('');
+  $('#tTa').innerHTML=D.tpagensi.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>{const st=x.status||'lunas',sr=st==='lunas'?0:sisaRef(x);return `<tr><td>${esc(x.tanggal)}</td><td>${esc(x.agensi)}</td><td class="r">${rp(x.nominal)}</td><td><span class="tag ${STC[st]||'ok'}">${STL[st]||'Lunas'}${sr>0?' · sisa '+rp(sr):st==='lunas'?'':' · selesai'}</span>${x.pihak?' <span class="note">'+esc(x.pihak)+'</span>':''}</td><td>${esc(x.catatan)}</td><td><button class="btn del" data-deltp="tpagensi" data-id="${esc(x.id)}">Hapus</button></td></tr>`}).join('')||'<tr><td colspan="6" class="note">Tidak ada top up pada periode ini.</td></tr>';
+    // akun page
+  $('#akCards').innerHTML=D.akun.map(a=>{const s=akStat(a),lv=s.sisa<=0?['bad','Habis']:s.sisa<minS()?['warn','Menipis']:['ok','Aman'];
+    return `<div class="ac"><div class="h"><span>${esc(a.nama)}</span><span class="tag ${lv[0]}">${lv[1]}</span></div><div class="row"><span>Agensi</span><b>${esc(a.agensi)}</b></div><div class="row"><span>Saldo awal periode</span><b>${rp(s.awal)}</b></div><div class="row"><span>+ Top up periode</span><b>${rp(s.topP)}</b></div><div class="row"><span>− Spend + PPN periode</span><b>${rp(s.spdP)}</b></div><div class="row"><span>Sisa saldo</span><b style="color:var(--${lv[0]==='ok'?'green':lv[0]==='warn'?'yellow':'red'})">${rp(s.sisa)}</b></div><div style="margin-top:8px"><a href="#" class="note" data-delak="${esc(a.nama)}">Hapus akun</a></div></div>`}).join('')||'<div class="note">Belum ada akun iklan.</div>';
+    $('#tTk').innerHTML=D.tpakun.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.akun)}</td><td class="r">${rp(x.nominal)}</td><td>${esc(x.catatan)}</td><td><button class="btn del" data-deltp="tpakun" data-id="${esc(x.id)}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="5" class="note">Kosong.</td></tr>';
+  $('#tSp').innerHTML=D.spend.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.akun)}</td><td class="r">${rp(x.spend)}</td><td class="r">${x.spendppn?(+x.ppn||0)+'%':'-'}</td><td class="r"><b>${rp(spv(x))}</b></td><td><button class="btn del" data-delsp="${esc(x.tanggal)}|${esc(x.akun)}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="6" class="note">Kosong.</td></tr>';
+  const ots=D.tpagensi.filter(x=>x.status==='hutang'||x.status==='titip');
+  $('#htKpi').innerHTML=[['Hutang Belum Lunas',rp(outAmt('hutang'))],['Titipan Belum Selesai',rp(outAmt('titip'))],['Jumlah Item Belum Selesai',ots.filter(x=>sisaRef(x)>0).length]].map(x=>`<div class="card kpi"><div class="l">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
+  $('#tHt').innerHTML=[...ots].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>{const s=sisaRef(x);return `<tr><td>${esc(x.tanggal)}</td><td>${esc(x.agensi)}</td><td><span class="tag ${STC[x.status]}">${STL[x.status]}</span></td><td>${esc(x.pihak)}</td><td class="r">${rp(x.nominal)}</td><td class="r">${rp(x.nominal-s)}</td><td class="r"><b style="color:var(--${s>0?'red':'green'})">${s>0?rp(s):'Selesai'}</b></td></tr>`}).join('')||'<tr><td colspan="7" class="note">Belum ada top up berstatus hutang/titip.</td></tr>';
+  const lbl=r=>{const x=D.tpagensi.find(t=>t.id===r);return x?x.tanggal+' · '+x.agensi+' · '+STL[x.status]+' '+(x.pihak||''):'(top up dihapus)'};
+  $('#tPl').innerHTML=[...D.pelunasan].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(lbl(x.ref))}</td><td class="r">${rp(x.nominal)}</td><td>${esc(x.catatan)}</td><td><button class="btn del" data-delpl="${esc(x.id)}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="5" class="note">Belum ada pelunasan.</td></tr>';
+  const cr=$('#plRef').value;$('#plRef').innerHTML=ots.filter(x=>sisaRef(x)>0).map(x=>`<option value="${esc(x.id)}">${esc(x.tanggal+' · '+x.agensi+' · '+STL[x.status]+' '+(x.pihak||'')+' · sisa '+rp(sisaRef(x)))}</option>`).join('');if(cr)$('#plRef').value=cr;
+  const bl=$('#sbBln').value||iso(new Date()).slice(0,7),st0=bl+'-01';
+  const rows=[...agNames().map(n=>['agensi',n]),...D.akun.map(a=>['akun',a.nama])];
+  $('#tSbView').innerHTML=rows.map(([k,n])=>{const an=D.saldoawal.find(x=>x.jenis===k&&same(x.nama,n)&&x.bulan.slice(0,10)===st0);
+    return `<tr><td>${k==='agensi'?'Agensi':'Akun iklan'}</td><td>${esc(n)}</td><td class="r">${rp(balAt(k,n,st0))}</td><td><span class="tag ${an?'ok':'warn'}">${an?'Patokan manual':'Dihitung otomatis'}</span></td></tr>`}).join('')||'<tr><td colspan="4" class="note">Belum ada agensi/akun.</td></tr>';
+  $('#tSb').innerHTML=[...D.saldoawal].sort((a,b)=>b.bulan.localeCompare(a.bulan)).map(x=>`<tr><td>${esc(x.bulan.slice(0,7))}</td><td>${x.jenis==='agensi'?'Agensi':'Akun iklan'}</td><td>${esc(x.nama)}</td><td class="r">${rp(x.nominal)}</td><td><button class="btn del" data-delsb="${esc(x.bulan)}|${esc(x.jenis)}|${esc(x.nama)}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="5" class="note">Belum ada patokan tersimpan.</td></tr>';
+  buildReport();
+}
+
+/* ---------- laporan WA ---------- */
+function buildReport(){
+  const only=$('#lpAg').value,det=$('#lpDet').value==='1',ag=agNames().filter(g=>!only||g===only);
+  const f=d=>d.split('-').reverse().join('/');
+  let t='📊 *Laporan Saldo Iklan*\n🗓 '+f($('#dFrom').value)+' – '+f($('#dTo').value)+'\n';
+  const T={awal:0,dep:0,spd:0,saldo:0,awalAk:0,sisa:0};
+  ag.forEach(g=>{const s=agStat(g);T.awal+=s.awalAg;T.dep+=s.depP;T.spd+=s.spdP;T.saldo+=s.saldo;T.awalAk+=s.awalAk;T.sisa+=s.sisaAk;
+    t+='\n*'+g+'*\n• Saldo awal agensi: '+rp(s.awalAg)+'\n• Top up agensi: '+rp(s.depP)+'\n• Dialokasi ke akun: '+rp(s.topAkP)+'\n• Saldo akhir agensi: '+rp(s.saldo)+'\n• Saldo awal akun: '+rp(s.awalAk)+'\n• Spend + PPN: '+rp(s.spdP)+'\n• Sisa saldo akun: '+rp(s.sisaAk)+'\n';
+    {const hu=outAmt('hutang',g),ti=outAmt('titip',g);if(hu)t+='• Hutang belum lunas: '+rp(hu)+'\n';if(ti)t+='• Titipan belum selesai: '+rp(ti)+'\n'}
+    if(det)s.aks.forEach(a=>{const k=akStat(a);t+='   – '+a.nama+': awal '+rp(k.awal)+' → sisa '+rp(k.sisa)+(k.sisa<=0?' ❌':k.sisa<minS()?' ⚠️ menipis':'')+'\n'})});
+  t+='\n*TOTAL*\n• Saldo awal agensi: '+rp(T.awal)+'\n• Top up agensi: '+rp(T.dep)+'\n• Saldo akhir agensi: '+rp(T.saldo)+'\n• Saldo awal akun: '+rp(T.awalAk)+'\n• Spend + PPN: '+rp(T.spd)+'\n• Sisa saldo akun: '+rp(T.sisa);
+  const hT=ag.reduce((s,g)=>s+outAmt('hutang',g),0),tT=ag.reduce((s,g)=>s+outAmt('titip',g),0);if(hT)t+='\n• Hutang belum lunas: '+rp(hT);if(tT)t+='\n• Titipan belum selesai: '+rp(tT);
+  $('#lpTxt').value=t;
+}
+
+/* ---------- aksi ---------- */
+function parseRp(s){s=String(s==null?'':s).toLowerCase().replace(/rp/g,'').replace(/\s/g,'');if(!s)return 0;const m=s.match(/^([\d.,]+)(jt|juta|rb|ribu|k)?$/);if(!m)return 0;let n;if(m[2]){n=parseFloat(m[1].replace(',','.'))||0;n*=(m[2]==='jt'||m[2]==='juta')?1e6:1e3}else n=parseFloat(m[1].replace(/[.,]/g,''))||0;return Math.round(n)}
+const num=id=>parseRp($(id).value);
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('[data-p],[data-deltp],[data-delsp],[data-delag],[data-delak],[data-delsb],[data-ppnag],[data-delpl]');if(!t)return;
+  const d=t.dataset;
+  if(d.p){$$('.nav').forEach(n=>n.classList.toggle('on',n===t));$$('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+d.p));if(d.p==='akun'||d.p==='saldo')renderGrid();return}
+  e.preventDefault();
+  if(d.deltp){if(!confirm('Hapus catatan ini?'))return;D[d.deltp]=D[d.deltp].filter(x=>x.id!==d.id);save();renderAll();push(d.deltp,{id:d.id,hapus:true})}
+  if(d.delsp){const[tg,ak]=d.delsp.split('|');D.spend=D.spend.filter(x=>!(x.tanggal===tg&&x.akun===ak));save();renderAll();push('spend',{tanggal:tg,akun:ak,hapus:true})}
+  if(d.delag){if(!confirm('Hapus agensi "'+d.delag+'"? Riwayat top up tetap tersimpan.'))return;D.agensi=D.agensi.filter(x=>x.nama!==d.delag);save();renderAll();push('agensi',{nama:d.delag,hapus:true})}
+  if(d.ppnag){const g=D.agensi.find(x=>x.nama===d.ppnag),v=prompt('PPN agensi '+d.ppnag+' (%). Berlaku untuk spend yang diinput SETELAH ini; spend lama tidak berubah.',+g.ppn||0);if(v===null)return;g.ppn=Math.max(0,+v||0);save();renderAll();push('agensi',g)}
+  if(d.delpl){if(!confirm('Hapus pelunasan ini?'))return;D.pelunasan=D.pelunasan.filter(x=>x.id!==d.delpl);save();renderAll();push('pelunasan',{id:d.delpl,hapus:true})}
+  if(d.delsb){const[b,j,n]=d.delsb.split('|');D.saldoawal=D.saldoawal.filter(x=>!(x.bulan===b&&x.jenis===j&&x.nama===n));save();renderAll();push('saldoawal',{bulan:b,jenis:j,nama:n,hapus:true})}
+  if(d.delak){if(!confirm('Hapus akun "'+d.delak+'"?'))return;D.akun=D.akun.filter(x=>x.nama!==d.delak);save();renderAll();push('akun',{nama:d.delak,hapus:true})}
+});
+$('#agAdd').onclick=()=>{const n=$('#agNew').value.trim();if(!n)return;if(D.agensi.some(x=>same(x.nama,n)))return toast('Agensi sudah ada');
+  const o={nama:n,aktif:'ya',ppn:Math.max(0,+$('#agPpn').value||0)};D.agensi.push(o);save();$('#agNew').value='';$('#agPpn').value=0;renderAll();push('agensi',o)};
+$('#akAdd').onclick=()=>{const n=$('#akNew').value.trim(),g=$('#akAg').value;if(!n||!g)return toast('Isi nama akun & pilih agensi');if(D.akun.some(x=>same(x.nama,n)))return toast('Akun sudah ada');
+  const o={nama:n,agensi:g,aktif:'ya'};D.akun.push(o);save();$('#akNew').value='';renderAll();push('akun',o)};
+$('#taSave').onclick=()=>{const o={id:uid(),tanggal:$('#taTgl').value,agensi:$('#taAg').value,nominal:num('#taNom'),catatan:$('#taCat').value.trim(),status:$('#taSt').value,pihak:$('#taPh').value.trim()};
+  if(o.status!=='lunas'&&!o.pihak)return toast('Isi nama pihak untuk hutang/titip');
+  if(!o.agensi||!o.tanggal||o.nominal<=0)return toast('Lengkapi agensi, tanggal & nominal');
+  D.tpagensi.push(o);save();$('#taNom').value=$('#taCat').value=$('#taPh').value='';$('#taSt').value='lunas';renderAll();toast('Top up agensi tersimpan');push('tpagensi',o)};
+$('#plRef').onchange=()=>{const x=D.tpagensi.find(t=>t.id===$('#plRef').value);if(x)$('#plNom').value=sisaRef(x)};
+$('#plSave').onclick=()=>{const ref=$('#plRef').value,x=D.tpagensi.find(t=>t.id===ref),v=num('#plNom');if(!x||!$('#plTgl').value||v<=0)return toast('Pilih top up, tanggal & nominal');
+  if(v>sisaRef(x)&&!confirm('Nominal melebihi sisa ('+rp(sisaRef(x))+'). Tetap simpan?'))return;
+  const o={id:uid(),tanggal:$('#plTgl').value,ref,nominal:v,catatan:$('#plCat').value.trim()};D.pelunasan.push(o);save();$('#plNom').value=$('#plCat').value='';renderAll();toast('Pelunasan tersimpan');push('pelunasan',o)};
+$('#sbBln').onchange=()=>{renderAll();renderGrid('awal')};
+$('#sbAuto').onclick=async()=>{const m=$('#sbBln').value;if(!m)return toast('Pilih bulan dulu');const st0=m+'-01';
+  const rows=[...agNames().map(n=>['agensi',n]),...D.akun.map(a=>['akun',a.nama])].filter(([k,n])=>!D.saldoawal.some(x=>x.jenis===k&&same(x.nama,n)&&x.bulan.slice(0,10)===st0));
+  if(!rows.length)return toast('Semua sudah punya patokan bulan ini');if(!confirm('Buat '+rows.length+' patokan saldo awal untuk '+m+'?'))return;
+  const os=rows.map(([k,n])=>({bulan:st0,jenis:k,nama:n,nominal:balAt(k,n,st0)}));D.saldoawal.push(...os);save();renderAll();toast(os.length+' patokan dibuat');for(const o of os)await push('saldoawal',o)};
+['#lpAg','#lpDet','#dFrom','#dTo'].forEach(s=>$(s).addEventListener('change',()=>{renderAll();renderGrid()}));
+$('#lpReset').onclick=buildReport;
+$('#lpPhone').value=S.phone||'';$('#lpPhone').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'');S.phone=e.target.value;save()};
+$('#lpWa').onclick=()=>{const p=$('#lpPhone').value.replace(/\D/g,'');window.open('https://wa.me/'+p+'?text='+encodeURIComponent($('#lpTxt').value),'_blank')};
+$('#lpCopy').onclick=()=>navigator.clipboard.writeText($('#lpTxt').value).then(()=>toast('Teks laporan disalin'));
+$('#url').value=S.url||'';$('#minS').value=minS();
+$('#url').onchange=e=>{S.url=e.target.value.trim();save();pull()};
+$('#minS').onchange=e=>{S.min=+e.target.value||0;save();renderAll()};
+$('#bPull').onclick=()=>{S.url=$('#url').value.trim();save();pull()};
+$('#bPush').onclick=()=>{S.url=$('#url').value.trim();save();if(!S.url)return toast('Isi URL dulu');pushAll()};
+$('#bRefresh').onclick=()=>pull();
+$('#bReset').onclick=()=>{if(confirm('Hapus semua data lokal di browser ini?')){localStorage.removeItem(K);localStorage.removeItem(K+'s');location.reload()}};
+$('#bTheme').onclick=()=>{const r=document.documentElement,l=r.dataset.theme==='light';l?r.removeAttribute('data-theme'):r.setAttribute('data-theme','light');localStorage.setItem('saldoTheme',l?'dark':'light');renderAll()};
+/* ---------- input tabel (grid) per menu ---------- */
+const fmtN=n=>n?Number(n).toLocaleString('id-ID'):'';
+const gDate=k=>k==='awal'?($('#sbBln').value||iso(new Date()).slice(0,7))+'-01':$('#gTgl-akun').value;
+function renderGrid(kind){
+  if(!kind){['topup','spend','awal'].forEach(renderGrid);return}
+  const t=gDate(kind),aks=D.akun.filter(a=>a.aktif!=='tidak').sort((a,b)=>String(a.agensi).localeCompare(b.agensi)||String(a.nama).localeCompare(b.nama)),H=$('#gHead-'+kind),B=$('#gBody-'+kind),inf=$('#gInfo-'+kind);
+  const inp=(o,ph)=>`<input class="gi" data-money inputmode="decimal" data-orig="${o||''}" value="${fmtN(o)}" placeholder="${ph||''}" style="width:150px;text-align:right">`;
+  if(kind==='spend'){
+    inf.textContent='Spend tanggal '+t+' — angka yang sudah pernah diinput di tanggal ini otomatis terisi.';
+    H.innerHTML='<tr><th>Akun</th><th class="r">PPN</th><th class="r">Spend sebelum PPN</th><th class="r">Terpotong + PPN</th></tr>';
+    B.innerHTML=aks.map(a=>{const ex=D.spend.find(x=>x.tanggal===t&&same(x.akun,a.nama)),p=ppnOf(a.nama);
+      return `<tr data-k="${esc(a.nama)}" data-ag="${esc(a.agensi)}" data-ppn="${p}"><td><b>${esc(a.nama)}</b></td><td class="r">${p}%</td><td class="r">${inp(ex&&ex.spend,'0')}</td><td class="r" data-pot>${ex?rp(spv(ex)):'-'}</td></tr>`}).join('');
+  }else if(kind==='topup'){
+    inf.textContent='Top up ke akun iklan tanggal '+t+'.';
+    H.innerHTML='<tr><th>Akun</th><th>Agensi</th><th class="r">Sisa saldo</th><th class="r">Nominal top up</th><th>Catatan</th></tr>';
+    B.innerHTML=aks.map(a=>`<tr data-k="${esc(a.nama)}" data-ag="${esc(a.agensi)}"><td><b>${esc(a.nama)}</b></td><td>${esc(a.agensi)}</td><td class="r">${rp(akStat(a).sisa)}</td><td class="r"><input class="gi" data-money inputmode="decimal" placeholder="0" style="width:150px;text-align:right"></td><td><input class="gc" placeholder="Opsional" style="width:100%;min-width:140px"></td></tr>`).join('');
+  }else{
+    const m=t.slice(0,7);
+    inf.textContent='Patokan saldo awal bulan '+m+' (kolom "terhitung" = hasil hitung otomatis).';
+    H.innerHTML='<tr><th>Jenis</th><th>Nama</th><th class="r">Saldo awal terhitung</th><th class="r">Patokan manual</th></tr>';
+    B.innerHTML=[...agNames().map(n=>['agensi',n,n]),...aks.map(a=>['akun',a.nama,a.agensi])].map(([k,n,ag])=>{const an=D.saldoawal.find(x=>x.jenis===k&&same(x.nama,n)&&x.bulan.slice(0,10)===t);
+      return `<tr data-k="${esc(n)}" data-j="${k}" data-ag="${esc(ag)}"><td>${k==='agensi'?'Agensi':'Akun iklan'}</td><td><b>${esc(n)}</b></td><td class="r">${rp(balAt(k,n,t))}</td><td class="r">${inp(an&&an.nominal,'otomatis')}</td></tr>`}).join('');
+  }
+  if(!B.innerHTML)B.innerHTML='<tr><td colspan="5" class="note">Belum ada akun/agensi — tambahkan dulu.</td></tr>';
+  agFilter(kind);
+}
+function agFilter(k){const v=$('#gAg-'+(k==='awal'?'awal':'akun')).value;$$('#gBody-'+k+' tr[data-ag]').forEach(r=>r.style.display=(!v||r.dataset.ag===v)?'':'none')}
+const PEND=[];
+async function gridSave(kind,q){
+  const t=gDate(kind);if(!t){toast('Pilih tanggal/bulan');return 'cancel'}
+  const rows=$$('#gBody-'+kind+' tr[data-k]'),os=[];let type;
+  if(kind==='spend'){type='spend';rows.forEach(r=>{const i=r.querySelector('.gi');if(!i.value.trim())return;const v=parseRp(i.value);if(v===+i.dataset.orig)return;const p=+r.dataset.ppn||0;os.push({tanggal:t,akun:r.dataset.k,spend:v,ppn:p,spendppn:Math.round(v*(1+p/100))})});
+    os.forEach(o=>{D.spend=D.spend.filter(x=>!(x.tanggal===o.tanggal&&same(x.akun,o.akun)));D.spend.push(o)})}
+  else if(kind==='topup'){type='tpakun';rows.forEach(r=>{const v=parseRp(r.querySelector('.gi').value);if(v>0)os.push({id:uid(),tanggal:t,akun:r.dataset.k,nominal:v,catatan:r.querySelector('.gc').value.trim()})});
+    const by={};os.forEach(o=>{const a=D.akun.find(x=>same(x.nama,o.akun));if(a)by[a.agensi]=(by[a.agensi]||0)+o.nominal});
+    const over=Object.keys(by).filter(g=>by[g]>balAt('agensi',g,addDay(iso(new Date()),1)));
+    if(os.length&&over.length&&!confirm('Saldo agensi '+over.join(', ')+' tidak cukup untuk total top up ini. Tetap simpan?'))return 'cancel';D.tpakun.push(...os)}
+  else{type='saldoawal';rows.forEach(r=>{const i=r.querySelector('.gi');if(!i.value.trim())return;const v=parseRp(i.value);if(i.dataset.orig!==''&&v===+i.dataset.orig)return;os.push({bulan:t,jenis:r.dataset.j,nama:r.dataset.k,nominal:v})});
+    os.forEach(o=>{D.saldoawal=D.saldoawal.filter(x=>!(x.bulan.slice(0,10)===o.bulan&&x.jenis===o.jenis&&same(x.nama,o.nama)));D.saldoawal.push(o)})}
+  if(!os.length){if(!q)toast('Tidak ada yang diisi atau berubah');return 'none'}
+  save();const ps=os.map(o=>push(type,o));
+  if(q){PEND.push(...ps);return 'ok'}
+  renderAll();renderGrid();toast(os.length+' data tersimpan');await Promise.all(ps);return 'ok'
+}
+async function akunSave(){
+  const a=await gridSave('topup',true);if(a==='cancel')return;
+  const b=await gridSave('spend',true);if(b==='cancel')return;
+  if(a==='none'&&b==='none')return toast('Tidak ada yang diisi atau berubah');
+  renderAll();renderGrid();toast('Top up & spend tersimpan');
+  const ps=PEND.splice(0);await Promise.all(ps)
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-gsave],[data-gd]');if(!b)return;
+  if(b.dataset.gsave)return b.dataset.gsave==='akun'?akunSave():gridSave(b.dataset.gsave);
+  const n=+b.dataset.gd.split(':')[1];$('#gTgl-akun').value=addDay(iso(new Date()),n);renderGrid('topup');renderGrid('spend')});
+$('#gTgl-akun').onchange=()=>{renderGrid('topup');renderGrid('spend')};
+$('#gAg-akun').onchange=()=>{agFilter('topup');agFilter('spend')};$('#gAg-awal').onchange=()=>agFilter('awal');
+document.addEventListener('input',e=>{const t=e.target;if(!t.classList||!t.classList.contains('gi')||!t.closest('#gBody-spend'))return;const r=t.closest('tr'),v=parseRp(t.value);r.querySelector('[data-pot]').textContent=v?rp(Math.round(v*(1+(+r.dataset.ppn||0)/100))):'-'});
+document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('gi'))e.target.select()});
+document.addEventListener('focusout',e=>{const t=e.target;if(t.matches&&t.matches('[data-money]')&&t.value.trim()){const v=parseRp(t.value);if(v>0)t.value=fmtN(v)}});
+document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target;
+  if(t.classList&&t.classList.contains('gi')){e.preventDefault();const all=[...t.closest('tbody').querySelectorAll('.gi')].filter(i=>i.closest('tr').style.display!=='none'),n=all[all.indexOf(t)+1];(n||t.closest('.ts').nextElementSibling.querySelector('[data-gsave]')).focus();return}
+  const f=t.closest&&t.closest('.card.form');if(f&&t.tagName==='INPUT'){const b=f.querySelector('.btn:not(.sec)');if(b){e.preventDefault();b.click()}}});
+const APPS_SCRIPT_CODE="// ============================================================\n// APPS SCRIPT — DASHBOARD SALDO IKLAN\n// Extensions > Apps Script > tempel > Deploy > New deployment > Web app\n// Execute as: Me | Who has access: Anyone -> salin URL /exec ke dashboard (menu Integrasi)\n// Sheet dibuat OTOMATIS kalau belum ada (tidak perlu bikin manual).\n// ============================================================\nvar CFG = {\n  agensi:   {s:'Agensi',      h:['nama','aktif','ppn'],                           k:['nama']},\n  akun:     {s:'Akun',        h:['nama','agensi','aktif'],                          k:['nama']},\n  tpagensi: {s:'TopUpAgensi', h:['id','tanggal','agensi','nominal','catatan','status','pihak'], k:['id']},\n  tpakun:   {s:'TopUpAkun',   h:['id','tanggal','akun','nominal','catatan'],        k:['id']},\n  spend:    {s:'SpendAkun',   h:['tanggal','akun','spend','ppn','spendppn'],      k:['tanggal','akun']},\n  pelunasan:{s:'Pelunasan',   h:['id','tanggal','ref','nominal','catatan'],        k:['id']},\n  saldoawal:{s:'SaldoAwal',   h:['bulan','jenis','nama','nominal'],                 k:['bulan','jenis','nama']}\n};\n\nfunction out(o){ return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\nfunction norm(v){ return fmtCell(v).toLowerCase(); }\nfunction fmtCell(v){\n  if(Object.prototype.toString.call(v)==='[object Date]')\n    return Utilities.formatDate(v, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), 'yyyy-MM-dd');\n  return String(v).trim();\n}\nfunction ensure(ss, c){\n  var sh = ss.getSheetByName(c.s);\n  if(!sh){ sh = ss.insertSheet(c.s); sh.appendRow(c.h); sh.setFrozenRows(1); return sh; }\n  // sheet lama: tambahkan kolom header yang belum ada (mis. ppn, spendppn)\n  var hd = sh.getRange(1,1,1,Math.max(1,sh.getLastColumn())).getValues()[0].map(function(x){return String(x).toLowerCase().trim();});\n  c.h.forEach(function(col){ if(hd.indexOf(col) < 0){ sh.getRange(1, hd.length+1).setValue(col); hd.push(col); } });\n  return sh;\n}\nfunction toObjects(sh){\n  var rows = sh.getDataRange().getValues(), hd = rows[0].map(function(h){return String(h).toLowerCase().trim();}), res = [];\n  for(var i=1;i<rows.length;i++){ var o={}; hd.forEach(function(h,j){ o[h]=fmtCell(rows[i][j]); }); res.push(o); }\n  return res;\n}\n\nfunction doGet(e){\n  var lock = LockService.getScriptLock(), got = false;\n  try{\n    got = lock.tryLock(15000);\n    var ss = SpreadsheetApp.getActiveSpreadsheet(), res = {};\n    Object.keys(CFG).forEach(function(t){ res[t] = toObjects(ensure(ss, CFG[t])); });\n    return out(res);\n  }catch(err){\n    return out({error:'doGet gagal: '+(err&&err.message?err.message:err)});\n  }finally{ if(got) lock.releaseLock(); }\n}\n\nfunction doPost(e){\n  var lock = LockService.getScriptLock();\n  try{ lock.waitLock(30000); }catch(x){ return out({status:'error', message:'Server sibuk, coba lagi.'}); }\n  try{\n    var d = JSON.parse(e.postData.contents), c = CFG[d.type];\n    if(!c) return out({status:'error', message:'type tidak dikenal: '+d.type});\n    var ss = SpreadsheetApp.getActiveSpreadsheet(), sh = ensure(ss, c), rows = sh.getDataRange().getValues();\n    var idx = c.k.map(function(k){ return c.h.indexOf(k); }); // kunci selalu di kolom awal\n    var hdr = sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0].map(function(x){return String(x).toLowerCase().trim();});\n    var vals = hdr.map(function(h){ return d[h]==null ? '' : d[h]; });\n    for(var i=1;i<rows.length;i++){\n      var same = idx.every(function(ci, n){ return norm(rows[i][ci]) === String(d[c.k[n]]==null?'':d[c.k[n]]).trim().toLowerCase(); });\n      if(same){\n        if(d.hapus) sh.deleteRow(i+1); else sh.getRange(i+1,1,1,vals.length).setValues([vals]);\n        return out({status:'ok'});\n      }\n    }\n    if(!d.hapus) sh.appendRow(vals);\n    return out({status:'ok'});\n  }catch(err){\n    return out({status:'error', message:String(err&&err.message?err.message:err)});\n  }finally{ lock.releaseLock(); }\n}\n\n// STRUKTUR SHEET (otomatis):\n// Agensi      : nama | aktif | ppn                        (ppn dalam %, beda tiap agensi)\n// Akun        : nama | agensi | aktif                      (akun iklan milik tiap agensi)\n// TopUpAgensi : id | tanggal | agensi | nominal | catatan  (setoran saldo ke agensi)\n// TopUpAkun   : id | tanggal | akun | nominal | catatan    (saldo dialokasikan ke akun iklan)\n// SpendAkun   : tanggal | akun | spend | ppn | spendppn                    (upsert per tanggal+akun)\n// SaldoAwal   : bulan (yyyy-MM-01) | jenis (agensi/akun) | nama | nominal   (patokan saldo awal per bulan)\n// Pelunasan   : id | tanggal | ref (id TopUpAgensi) | nominal | catatan   (pelunasan hutang / penyelesaian titipan)\n// TopUpAgensi punya kolom status (lunas/hutang/titip) & pihak.\n// Sisa saldo akun = total TopUpAkun - total SpendAkun | Saldo agensi = TopUpAgensi - TopUpAkun milik agensi itu\n";
+$('#scriptCode').textContent=APPS_SCRIPT_CODE;
+$('#bShowScript').onclick=()=>{const b=$('#scriptBox'),v=b.style.display!=='none';b.style.display=v?'none':'block';$('#bShowScript').textContent=v?'</> Lihat Kode Apps Script':'Sembunyikan Kode'};
+$('#bCopyScript').onclick=()=>navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>toast('Kode Apps Script disalin'));
+/* init */
+const now=new Date();$('#sbBln').value=iso(now).slice(0,7);$('#dFrom').value=iso(new Date(now.getFullYear(),now.getMonth(),1));$('#dTo').value=iso(now);
+['#taTgl','#plTgl','#gTgl-akun'].forEach(s=>$(s).value=iso(now));
+renderAll();renderGrid();
+if(S.url)pull(true);else setSt('sim','Mode lokal (belum terhubung)');
+</script>
+</body>
+</html>
