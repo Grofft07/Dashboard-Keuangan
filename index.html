@@ -22,13 +22,14 @@ body{background:var(--bg);color:var(--text);font:15px/1.6 'Roboto',sans-serif;-w
 .foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);display:flex;gap:8px;align-items:center}
 .foot i{width:7px;height:7px;border-radius:50%;background:var(--muted)}
 .foot.ok i{background:var(--green)}.foot.err i{background:var(--red)}.foot.sim i{background:var(--yellow)}
-.main{flex:1;padding:24px 30px 50px;min-width:0;max-width:1500px}
+.main{flex:1;padding:24px 30px 50px;min-width:0;max-width:2200px}
 .top{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:18px}
 .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .page{display:none}.page.on{display:block}
 h1{font-size:24px}h2{font-size:18px;margin:26px 0 12px}
 .note{font-size:12.5px;color:var(--muted)}
-input,select,textarea{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:8px 10px;font:13px 'Roboto',sans-serif}
+input,select,textarea{background:var(--panel-2);border:1px solid var(--line);color:var(--text);border-radius:7px;padding:8px 10px;font:14px 'Roboto',sans-serif}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--green);outline-offset:-1px;border-color:var(--green)}
 textarea{width:100%;min-height:260px;line-height:1.6}
 .btn{background:var(--green);color:#06150E;border:none;border-radius:8px;padding:9px 16px;font-weight:700;font-size:12.5px;cursor:pointer}
 .btn.sec{background:var(--panel-2);color:var(--text);border:1px solid var(--line)}
@@ -41,16 +42,18 @@ textarea{width:100%;min-height:260px;line-height:1.6}
 .form{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .form label{display:flex;flex-direction:column;gap:4px;font-size:11.5px;font-weight:600;color:var(--muted)}
 .ts{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
-table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
-th{text-align:left;color:var(--th);font-size:11.5px;text-transform:uppercase;padding:11px 12px;background:linear-gradient(180deg,var(--green),var(--greendark));white-space:nowrap}
-td{padding:9px 12px;border-top:1px solid var(--line)}tr:nth-child(odd) td{background:rgba(127,127,127,.04)}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+th{text-align:left;color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:12px 14px;background:var(--panel-2);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px;border-top:1px solid var(--line)}td.r{white-space:nowrap}tr:nth-child(odd) td{background:rgba(127,127,127,.04)}
 td.r,th.r{text-align:right}
 .tag{font-size:11.5px;padding:3px 9px;border-radius:12px;font-weight:600}
 .ok{background:rgba(34,197,94,.15);color:var(--green)}.warn{background:rgba(245,197,24,.15);color:var(--yellow)}.bad{background:rgba(239,68,68,.15);color:var(--red)}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;margin-top:10px}
 .ac{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
 .ac .h{display:flex;justify-content:space-between;align-items:center;font-weight:700;padding-bottom:10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
-.ac .row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px}.ac .row span:first-child{color:var(--muted)}.ac .row b{font-weight:600}
+.ac{border-left:4px solid var(--line)}.ac[data-lv=ok]{border-left-color:var(--green)}.ac[data-lv=warn]{border-left-color:var(--yellow)}.ac[data-lv=bad]{border-left-color:var(--red)}
+.ac>.row:nth-child(6){align-items:baseline;border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-size:15px}.ac>.row:nth-child(6) b{font-size:18px}
+.ac .row{display:flex;justify-content:space-between;padding:6px 0;font-size:13.5px}.ac .row span:first-child{color:var(--muted)}.ac .row b{font-weight:600}
 .ptabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-top:14px}
 .ptab{background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);font:inherit;font-weight:600;font-size:14px;padding:10px 16px;margin-bottom:-1px;cursor:pointer}
 .ptab:hover{color:var(--text)}.ptab.on{color:var(--green);border-bottom-color:var(--green)}
@@ -62,10 +65,36 @@ td.r,th.r{text-align:right}
 .stab .n{font-size:11.5px;opacity:.8}
 .stab .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
 .stab .dot.bad{background:var(--red)}.stab .dot.warn{background:var(--yellow)}
-.chartbox{position:relative;height:280px}
+.seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;gap:4px;margin:18px 0 8px}
+.seg button{background:none;border:0;border-radius:7px;padding:9px 18px;font:inherit;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--green);color:#fff}.seg span{font-size:12px;margin-left:4px}
+.akg{display:none}.akg.on{display:block}
+#akp-in .gi{width:150px !important;font-size:15px;font-weight:600}#akp-in .gc{width:100%;min-width:130px}
+.akwrap{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:20px;align-items:start}
+.ins{position:sticky;top:16px;max-height:calc(100vh - 100px);overflow-y:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:18px;font-size:13.5px}
+.ins h3{font-size:14.5px;margin-bottom:12px}.ins .big{font-size:24px;font-weight:700;line-height:1.2}
+.ins .sec{padding:12px 0;border-top:1px solid var(--line)}.ins h3+.sec{border-top:0;padding-top:0}
+.ins .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;margin-bottom:6px}
+.ins .li{display:flex;justify-content:space-between;gap:10px;padding:3px 0}.ins .li span{color:var(--muted)}
+.ins .pb{height:6px;border-radius:4px;background:var(--panel-2);overflow:hidden;margin:8px 0}.ins .pb i{display:block;height:100%;background:var(--green);transition:width .2s}
+@media(max-width:1100px){.akwrap{grid-template-columns:1fr}.ins{position:static;margin-top:0;max-height:none}}
+#akp-in tr.dirty td{background:rgba(34,197,94,.12)}
+.savebar{position:sticky;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:12px 0;margin-top:14px;z-index:5}
+.savebar .btn{padding:11px 22px;font-size:14px}
+#p-overview th{white-space:normal;line-height:1.25;padding:12px 9px}#p-overview td{padding:11px 9px;font-size:13.5px}#p-overview td:first-child{white-space:nowrap}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}.pgb{display:flex;align-items:center;gap:10px;font-size:13px}.pgb .btn{padding:6px 12px}.pgb select{padding:6px 8px}.btn:disabled{opacity:.4;cursor:default}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g4 .kpi .v{font-size:26px}.g5{grid-template-columns:repeat(5,minmax(0,1fr));margin-top:14px}
+.kpi2{background:var(--panel);border-left:4px solid var(--blue);padding:14px 16px}.kpi2 .l{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}.kpi2 .v{font-size:19px;font-weight:700;margin-top:6px}
+.g5 .kpi2:nth-child(4){border-left-color:var(--red)}.g5 .kpi2:nth-child(5){border-left-color:var(--yellow)}
+.ovrow{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr);gap:20px}.ovrow>div{display:flex;flex-direction:column}.ovrow>div>.card{flex:1}
+.stc{display:flex;gap:10px}.stn{flex:1;text-align:center;border-radius:10px;padding:10px 6px}.stn b{display:block;font-size:26px;line-height:1.1}.stn span{font-size:12px;font-weight:600}
+.sbar{display:flex;height:8px;border-radius:5px;overflow:hidden;background:var(--panel-2);margin:14px 0 12px}.sbar i{display:block;height:100%}
+.sli{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:13px}.sli span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:1100px){.g4,.g5{grid-template-columns:repeat(2,minmax(0,1fr))}.ovrow{grid-template-columns:1fr}}
+.chartbox{position:relative;height:300px}
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);padding:10px 18px;border-radius:9px;font-size:13px;display:none;z-index:9}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;margin-top:6px}.two h3{font-size:15px;margin:10px 0 4px}.two table{min-width:0;font-size:12.5px}.two th,.two td{padding:8px 8px}.two .gi{width:105px !important}.two .gc{min-width:90px !important}@media(max-width:1150px){.two{grid-template-columns:1fr}}
-@media(max-width:760px){.app{flex-direction:column}.sidebar{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;padding:10px}.brand,.foot{display:none}.main{padding:16px}}
+@media(max-width:760px){#akp-in .gi{width:140px !important}.app{flex-direction:column}.sidebar{width:100%;height:auto;position:static;flex-direction:row;overflow-x:auto;padding:10px}.brand,.foot{display:none}.main{padding:16px}}
 </style>
 <script>try{if(localStorage.getItem('saldoTheme')!=='dark')document.documentElement.setAttribute('data-theme','light')}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 </head>
@@ -90,9 +119,9 @@ td.r,th.r{text-align:right}
 
   <div class="page on" id="p-overview">
     <h1>Overview</h1><div class="note">Ringkasan top up &amp; sisa saldo iklan — top up/spend mengikuti periode, saldo selalu kumulatif</div>
-    <h2>Ringkasan</h2><div class="grid" id="kpis"></div>
-    <h2>Top Up vs Spend per Agensi</h2><div class="card"><div class="chartbox"><canvas id="ch"></canvas></div></div>
-    <h2>Saldo per Agensi</h2><div class="ts"><table><thead><tr><th>Agensi</th><th class="r">Saldo Awal Agensi</th><th class="r">Top Up Agensi</th><th class="r">Dialokasi ke Akun</th><th class="r">Saldo Akhir Agensi</th><th class="r">Saldo Awal Akun</th><th class="r">Spend + PPN</th><th class="r">Sisa Saldo Akun</th></tr></thead><tbody id="tAg"></tbody></table></div>
+    <h2>Ringkasan</h2><div id="kpis"></div>
+    <div class="ovrow"><div><h2>Top Up vs Spend per Agensi</h2><div class="card"><div class="chartbox"><canvas id="ch"></canvas></div></div></div><div><h2>Status Akun Iklan</h2><div class="card" id="ovStat"></div></div></div>
+    <h2>Saldo per Agensi</h2><div class="ts"><table><thead><tr><th>Agensi</th><th class="r">Saldo Awal Agensi</th><th class="r">Top Up Agensi</th><th class="r">Dialokasi ke Akun</th><th class="r">Saldo Akhir Agensi</th><th class="r">Saldo Awal Akun</th><th class="r">Spend + PPN</th><th class="r">Sisa Saldo Akun</th><th class="r">Hutang</th><th class="r">Titipan</th></tr></thead><tbody id="tAg"></tbody></table></div>
   </div>
 
   <div class="page" id="p-agensi">
@@ -103,9 +132,11 @@ td.r,th.r{text-align:right}
       <label>Agensi<select id="taAg"></select></label>
       <label>Nominal (Rp)<input data-money inputmode="decimal" id="taNom" placeholder="mis. 5jt" style="width:130px"></label>
       <label>Status<select id="taSt"><option value="lunas">Lunas</option><option value="hutang">Hutang</option><option value="titip">Titip</option></select></label>
+      <label id="taPartL" style="display:none">Bagian hutang/titip (Rp)<input data-money inputmode="decimal" id="taPart" placeholder="kosong = semua" style="width:150px"></label>
       <label>Pihak (hutang/titip)<input id="taPh" placeholder="Nama pemberi/penitip" style="width:170px"></label>
       <label style="flex:1;min-width:160px">Catatan<input id="taCat" placeholder="Opsional"></label>
       <button class="btn" id="taSave">Simpan Top Up</button>
+      <div class="note" id="taPrev" style="flex-basis:100%;font-weight:600"></div>
     </div>
     <h2>Kelola Agensi</h2>
     <div class="card form"><label>Nama agensi baru<input id="agNew" placeholder="mis. Agensi A"></label><label>PPN agensi (%)<input type="number" id="agPpn" min="0" step="0.1" value="0" style="width:110px"></label><button class="btn" id="agAdd">+ Tambah</button><div id="agList" class="bar"></div></div>
@@ -122,30 +153,23 @@ td.r,th.r{text-align:right}
     </div>
     <div class="akpane" id="akp-in">
     <h2>Top Up &amp; Spend Harian</h2>
-    <div class="card form"><label>Tanggal<input type="date" id="gTgl-akun"></label><label>Agensi<select id="gAg-akun"></select></label><button class="btn sec" data-gd="akun:0">Hari ini</button><button class="btn sec" data-gd="akun:-1">Kemarin</button><span class="note">Kiri: top up ke akun. Kanan: spend sebelum PPN (PPN dihitung otomatis per agensi).</span></div>
-    <div class="two">
-      <div><h3>Top Up ke Akun Iklan</h3><div class="note" id="gInfo-topup"></div><div class="ts"><table><thead id="gHead-topup"></thead><tbody id="gBody-topup"></tbody></table></div></div>
-      <div><h3>Catat Spend Harian</h3><div class="note" id="gInfo-spend"></div><div class="ts"><table><thead id="gHead-spend"></thead><tbody id="gBody-spend"></tbody></table></div></div>
-    </div>
-    <div class="bar" style="margin-top:12px"><button class="btn" data-gsave="akun">💾 Simpan Top Up &amp; Spend</button><span class="note">Baris kosong / tidak berubah dilewati. Nominal boleh singkat: 500rb, 2,5jt. Enter = baris berikutnya.</span></div>
+    <div class="card form"><label>Tanggal<input type="date" id="gTgl-akun"></label><label>Agensi<select id="gAg-akun"></select></label><button class="btn sec" data-gd="akun:0">Hari ini</button><button class="btn sec" data-gd="akun:-1">Kemarin</button><span class="note">Pilih tanggal &amp; agensi, isi angkanya, lalu Simpan. Spend dicatat sebelum PPN (PPN dihitung otomatis).</span></div>
+    <div class="akwrap"><div style="min-width:0">
+    <div class="seg"><button class="on" data-akgrid="sp">🧾 Spend Harian <span id="nSp"></span></button><button data-akgrid="tp">💰 Top Up <span id="nTp"></span></button></div>
+    <div class="akg on" id="akg-sp"><div class="note" id="gInfo-spend"></div><div class="ts"><table><thead id="gHead-spend"></thead><tbody id="gBody-spend"></tbody></table></div></div>
+    <div class="akg" id="akg-tp"><div class="note" id="gInfo-topup"></div><div class="ts"><table><thead id="gHead-topup"></thead><tbody id="gBody-topup"></tbody></table></div></div>
+    </div><aside class="ins" id="akIns"></aside></div>
+    <div class="bar savebar"><button class="btn" data-gsave="akun">💾 Simpan</button><b id="akStat" class="note" style="font-weight:600">Belum ada perubahan</b><span class="note">Nominal boleh singkat: 500rb, 2,5jt · Enter = baris berikutnya</span></div>
     <h2>Riwayat Top Up ke Akun</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Akun</th><th class="r">Nominal</th><th>Catatan</th><th></th></tr></thead><tbody id="tTk"></tbody></table></div>
     <h2>Riwayat Spend</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Akun</th><th class="r">Spend</th><th class="r">PPN</th><th class="r">Spend + PPN</th><th></th></tr></thead><tbody id="tSp"></tbody></table></div>
     </div>
   </div>
 
   <div class="page" id="p-hutang">
-    <h1>Hutang &amp; Titipan</h1><div class="note">Top up agensi berstatus <b>Hutang</b> (belum dibayar ke agensi) atau <b>Titip</b> (memakai dana pihak lain). Saldo iklan tetap bertambah; di sini dilacak sisa yang belum diselesaikan.</div>
+    <h1>Hutang &amp; Titipan</h1><div class="note">Top up agensi berstatus <b>Hutang</b> (belum dibayar ke agensi) atau <b>Titip</b> (memakai dana pihak lain). Dicatat saat top up di menu Top Up Agensi. Saldo iklan tetap bertambah; di sini dilacak sisa yang belum diselesaikan. Klik <b>✓ Selesai</b> pada daftar kalau sudah dibayar / dikembalikan.</div>
     <h2>Ringkasan</h2><div class="grid" id="htKpi"></div>
-    <h2>Catat Pelunasan / Penyelesaian</h2>
-    <div class="card form">
-      <label>Tanggal<input type="date" id="plTgl"></label>
-      <label>Top up<select id="plRef" style="min-width:260px"></select></label>
-      <label>Nominal (Rp)<input data-money inputmode="decimal" id="plNom" style="width:130px"></label>
-      <label style="flex:1;min-width:140px">Catatan<input id="plCat" placeholder="mis. transfer ke agensi / dikembalikan ke penitip"></label>
-      <button class="btn" id="plSave">Simpan</button>
-    </div>
-    <h2>Daftar Hutang &amp; Titipan</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Agensi</th><th>Status</th><th>Pihak</th><th class="r">Nominal</th><th class="r">Sudah Diselesaikan</th><th class="r">Sisa</th></tr></thead><tbody id="tHt"></tbody></table></div>
-    <h2>Riwayat Pelunasan</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Top up</th><th class="r">Nominal</th><th>Catatan</th><th></th></tr></thead><tbody id="tPl"></tbody></table></div>
+    <h2>Daftar Hutang &amp; Titipan</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Agensi</th><th>Status</th><th>Pihak</th><th class="r">Nominal</th><th class="r">Sudah Diselesaikan</th><th class="r">Sisa</th><th></th></tr></thead><tbody id="tHt"></tbody></table></div>
+    <h2>Riwayat Penyelesaian</h2><div class="ts"><table><thead><tr><th>Tanggal</th><th>Top up</th><th class="r">Nominal</th><th>Catatan</th><th></th></tr></thead><tbody id="tPl"></tbody></table></div>
   </div>
 
   <div class="page" id="p-saldo">
@@ -273,6 +297,43 @@ function setAkMode(m){akMode=m==='in'?'in':'sum';try{localStorage.setItem('saldo
   $$('.ptab').forEach(b=>b.classList.toggle('on',b.dataset.akmode===akMode));
   $('#akp-sum').classList.toggle('on',akMode==='sum');$('#akp-in').classList.toggle('on',akMode==='in')}
 let akTab='__all';try{akTab=localStorage.getItem('saldoIklanAkTab')||'__all'}catch(e){}
+function akDirty(){let sp=0,tp=0,tot=0;
+  $$('#gBody-spend tr[data-k]').forEach(r=>{const i=r.querySelector('.gi'),d=!!i.value.trim()&&parseRp(i.value)!==+i.dataset.orig;r.classList.toggle('dirty',d);if(d)sp++});
+  $$('#gBody-topup tr[data-k]').forEach(r=>{const v=parseRp(r.querySelector('.gi').value);r.classList.toggle('dirty',v>0);if(v>0){tp++;tot+=v}});
+  $('#nSp').textContent=sp?'· '+sp:'';$('#nTp').textContent=tp?'· '+tp:'';
+  $('#akStat').textContent=(sp||tp)?sp+' spend · '+tp+' top up'+(tp?' ('+rp(tot)+')':'')+' siap disimpan':'Belum ada perubahan';akIns()}
+function akIns(){
+  const el=$('#akIns'),t=$('#gTgl-akun').value;if(!el||!t)return;
+  const ag=$('#gAg-akun').value,isSp=$('#akg-sp').classList.contains('on');
+  const aks=D.akun.filter(a=>a.aktif!=='tidak'&&(!ag||same(a.agensi,ag)));
+  const avg=a=>sumSp(D.spend.filter(x=>same(x.akun,a.nama)&&x.tanggal>=addDay(t,-7)&&x.tanggal<t))/7;
+  const info=aks.map(a=>{const s=akStat(a).sisa,v=avg(a);return {a,s,v,d:v>0?s/v:null}});
+  const days=i=>i.s<=0?'Habis':'±'+Math.max(1,Math.floor(i.d))+' hari';
+  const col=i=>i.s<=0||i.d<=2?'red':'yellow';
+  const li=(l,r,c)=>`<div class="li"><span>${l}</span><b${c?` style="color:var(--${c})"`:''}>${r}</b></div>`;
+  const sec=(l,b)=>`<div class="sec"><div class="lbl">${l}</div>${b}</div>`;
+  const rows=$$('#gBody-'+(isSp?'spend':'topup')+' tr[data-k]').filter(r=>r.style.display!=='none');
+  const val=r=>parseRp(r.querySelector('.gi').value),has=r=>r.querySelector('.gi').value.trim();
+  const risk=info.filter(i=>i.s<=0||(i.d!=null&&i.d<=5)).sort((a,b)=>(a.s<=0?-1:a.d)-(b.s<=0?-1:b.d));
+  let h;
+  if(isSp){
+    const filled=rows.filter(has),miss=rows.filter(r=>!has(r)).map(r=>r.dataset.k);
+    const tot=filled.reduce((x,r)=>x+val(r),0),totP=filled.reduce((x,r)=>x+Math.round(val(r)*(1+(+r.dataset.ppn||0)/100)),0);
+    const yest=sumSp(D.spend.filter(x=>x.tanggal===addDay(t,-1)&&aks.some(a=>same(a.nama,x.akun))));
+    const avgT=info.reduce((x,i)=>x+i.v,0),diff=yest>0&&totP?Math.round((totP-yest)/yest*100):null;
+    h='<h3>📈 Insight '+esc(t)+'</h3>'+
+      sec('Progres input','<div class="big">'+filled.length+'<span class="note"> / '+rows.length+' akun</span></div><div class="pb"><i style="width:'+(rows.length?filled.length/rows.length*100:0)+'%"></i></div>'+(miss.length?'<div class="note">Belum diisi: '+miss.slice(0,4).map(esc).join(', ')+(miss.length>4?' +'+(miss.length-4)+' lainnya':'')+'</div>':'<div class="note" style="color:var(--green)">Semua akun sudah terisi ✓</div>'))+
+      sec('Total spend',li('Sebelum PPN',rp(tot))+li('Terpotong + PPN',rp(totP))+li('Kemarin',yest?rp(yest):'-')+(diff!=null?li('Dibanding kemarin',(diff>0?'↑ ':diff<0?'↓ ':'')+Math.abs(diff)+'%',diff>20?'red':diff<-20?'yellow':''):'')+li('Rata-rata/hari (7 hr)',avgT?rp(avgT):'-'));
+  }else{
+    const by={};rows.forEach(r=>{const v=val(r);if(v>0)by[r.dataset.ag]=(by[r.dataset.ag]||0)+v});
+    const tot=Object.values(by).reduce((x,v)=>x+v,0),gs=[...new Set(aks.map(a=>a.agensi))];
+    h='<h3>📈 Insight Top Up</h3>'+sec('Top up diinput','<div class="big">'+rp(tot)+'</div>')+
+      sec('Saldo agensi tersedia',gs.map(g=>{const b=balAt('agensi',g,addDay(iso(new Date()),1)),u=by[g]||0;return li(esc(g),rp(b),b<u?'red':'')+(u?'<div class="note" style="text-align:right">'+(b<u?'⚠ kurang '+rp(u-b):'sisa setelah top up '+rp(b-u))+'</div>':'')}).join('')||'<div class="note">-</div>');
+  }
+  h+=sec(isSp?'Estimasi saldo habis':'Perlu top up',risk.length?risk.slice(0,5).map(i=>li(esc(i.a.nama),days(i),col(i))+(!isSp&&i.v>0?'<div class="note" style="text-align:right">saran '+rp(Math.max(0,Math.ceil((i.v*7-i.s)/1e5)*1e5))+' (cukup 7 hari)</div>':'')).join('')+(risk.length>5?'<div class="note">+'+(risk.length-5)+' akun lainnya</div>':''):'<div class="note" style="color:var(--green)">Semua akun aman, estimasi di atas 5 hari ✓</div>');
+  el.innerHTML=h;
+}
+document.addEventListener('input',e=>{if(e.target.closest&&e.target.closest('#akp-in'))akDirty()});
 function renderAkCards(){
   setAkMode(akMode);
   const lvOf=x=>x.sisa<=0?['bad','Habis']:x.sisa<minS()?['warn','Menipis']:['ok','Aman'];
@@ -286,32 +347,44 @@ function renderAkCards(){
   const shown=akTab==='__all'?rows:rows.filter(r=>same(r.a.agensi,akTab));
   $('#akSum').textContent=shown.length+' akun · total sisa saldo '+rp(shown.reduce((t,r)=>t+r.s.sisa,0));
   $('#akCards').innerHTML=shown.map(({a,s})=>{const lv=lvOf(s);
-    return `<div class="ac"><div class="h"><span>${esc(a.nama)}</span><span class="tag ${lv[0]}">${lv[1]}</span></div><div class="row"><span>Agensi</span><b>${esc(a.agensi)}</b></div><div class="row"><span>Saldo awal periode</span><b>${rp(s.awal)}</b></div><div class="row"><span>+ Top up periode</span><b>${rp(s.topP)}</b></div><div class="row"><span>− Spend + PPN periode</span><b>${rp(s.spdP)}</b></div><div class="row"><span>Sisa saldo</span><b style="color:var(--${lv[0]==='ok'?'green':lv[0]==='warn'?'yellow':'red'})">${rp(s.sisa)}</b></div><div style="margin-top:8px"><a href="#" class="note" data-delak="${esc(a.nama)}">Hapus akun</a></div></div>`}).join('')||'<div class="note">'+(D.akun.length?'Tidak ada akun di agensi ini.':'Belum ada akun iklan.')+'</div>';
+    return `<div class="ac" data-lv="${lv[0]}"><div class="h"><span>${esc(a.nama)}</span><span class="tag ${lv[0]}">${lv[1]}</span></div><div class="row"><span>Agensi</span><b>${esc(a.agensi)}</b></div><div class="row"><span>Saldo awal periode</span><b>${rp(s.awal)}</b></div><div class="row"><span>+ Top up periode</span><b>${rp(s.topP)}</b></div><div class="row"><span>− Spend + PPN periode</span><b>${rp(s.spdP)}</b></div><div class="row"><span>Sisa saldo</span><b style="color:var(--${lv[0]==='ok'?'green':lv[0]==='warn'?'yellow':'red'})">${rp(s.sisa)}</b></div><div style="margin-top:8px"><a href="#" class="note" data-delak="${esc(a.nama)}">Hapus akun</a></div></div>`}).join('')||'<div class="note">'+(D.akun.length?'Tidak ada akun di agensi ini.':'Belum ada akun iklan.')+'</div>';
 }
+const PG={};
+function pager(id,rows,empty){
+  const st=PG[id]||(PG[id]={p:1,n:10});if(rows){st.rows=rows;st.e=empty}else{rows=st.rows;empty=st.e}
+  const n=st.n,pages=Math.max(1,Math.ceil(rows.length/n));if(st.p>pages)st.p=pages;if(st.p<1)st.p=1;
+  $('#'+id).innerHTML=rows.length?rows.slice((st.p-1)*n,st.p*n).join(''):empty;
+  let el=$('#pg-'+id);if(!el){el=document.createElement('div');el.id='pg-'+id;el.className='pager';$('#'+id).closest('.ts').after(el)}
+  el.innerHTML=rows.length<=10?'<span class="note">'+rows.length+' data</span>':'<span class="note">'+((st.p-1)*n+1)+'–'+Math.min(st.p*n,rows.length)+' dari '+rows.length+' data</span><span class="pgb"><button class="btn sec" data-pg="'+id+':-1"'+(st.p<=1?' disabled':'')+'>‹ Sebelumnya</button><b>Hal '+st.p+' / '+pages+'</b><button class="btn sec" data-pg="'+id+':1"'+(st.p>=pages?' disabled':'')+'>Berikutnya ›</button><select data-pgn="'+id+'">'+[10,25,50,100].map(v=>'<option value="'+v+'"'+(v===n?' selected':'')+'>'+v+' / hal</option>').join('')+'</select></span>'
+}
+document.addEventListener('change',e=>{const i=e.target.dataset&&e.target.dataset.pgn;if(i){PG[i].n=+e.target.value;PG[i].p=1;pager(i)}});
 function renderAll(){
   fillSel();
   const ag=agNames(),st=ag.map(agStat);
   const tot=k=>st.reduce((s,x)=>s+x[k],0);
-  $('#kpis').innerHTML=[['Saldo Awal Agensi',rp(tot('awalAg'))],['Saldo Awal Akun Iklan',rp(tot('awalAk'))],['Top Up Agensi (periode)',rp(tot('depP'))],['Top Up ke Akun (periode)',rp(tot('topAkP'))],['Spend + PPN (periode)',rp(tot('spdP'))],['Saldo Akhir Agensi',rp(tot('saldo'))],['Sisa Saldo Akun Iklan',rp(tot('sisaAk'))],['Hutang Belum Lunas',rp(outAmt('hutang'))],['Titipan Belum Selesai',rp(outAmt('titip'))]]
-    .map(x=>`<div class="card kpi"><div class="l">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
-  $('#tAg').innerHTML=ag.map((g,i)=>{const s=st[i];return `<tr><td><b>${esc(g)}</b></td><td class="r">${rp(s.awalAg)}</td><td class="r">${rp(s.depP)}</td><td class="r">${rp(s.topAkP)}</td><td class="r"><b>${rp(s.saldo)}</b></td><td class="r">${rp(s.awalAk)}</td><td class="r">${rp(s.spdP)}</td><td class="r"><b>${rp(s.sisaAk)}</b></td></tr>`}).join('')||'<tr><td colspan="8" class="note">Belum ada agensi — tambahkan di menu Top Up Agensi.</td></tr>';
+  const kc=(arr,c)=>arr.map(x=>`<div class="card ${c}"><div class="l">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
+  $('#kpis').innerHTML='<div class="grid g4">'+kc([['Saldo Akhir Agensi',rp(tot('saldo'))],['Sisa Saldo Akun Iklan',rp(tot('sisaAk'))],['Top Up Agensi (periode)',rp(tot('depP'))],['Spend + PPN (periode)',rp(tot('spdP'))]],'kpi')+'</div><div class="grid g5">'+kc([['Saldo Awal Agensi',rp(tot('awalAg'))],['Saldo Awal Akun Iklan',rp(tot('awalAk'))],['Top Up ke Akun (periode)',rp(tot('topAkP'))],['Hutang Belum Lunas',rp(outAmt('hutang'))],['Titipan Belum Selesai',rp(outAmt('titip'))]],'kpi2')+'</div>';
+  const sa=D.akun.filter(a=>a.aktif!=='tidak').map(a=>({a,s:akStat(a).sisa})),mn=minS(),cn={ok:sa.filter(x=>x.s>=mn).length,warn:sa.filter(x=>x.s>0&&x.s<mn).length,bad:sa.filter(x=>x.s<=0).length},at=sa.filter(x=>x.s<mn).sort((x,y)=>x.s-y.s);
+  $('#ovStat').innerHTML='<div class="stc"><div class="stn ok"><b>'+cn.ok+'</b><span>Aman</span></div><div class="stn warn"><b>'+cn.warn+'</b><span>Menipis</span></div><div class="stn bad"><b>'+cn.bad+'</b><span>Habis</span></div></div>'+
+    '<div class="sbar"><i style="width:'+(sa.length?cn.ok/sa.length*100:0)+'%;background:var(--green)"></i><i style="width:'+(sa.length?cn.warn/sa.length*100:0)+'%;background:var(--yellow)"></i><i style="width:'+(sa.length?cn.bad/sa.length*100:0)+'%;background:var(--red)"></i></div>'+
+    (at.length?'<div class="note" style="font-weight:600;margin-bottom:4px">Perlu perhatian</div>'+at.slice(0,5).map(x=>'<div class="sli"><span title="'+esc(x.a.nama)+'">'+esc(x.a.nama)+'</span><b style="color:var(--'+(x.s<=0?'red':'yellow')+');white-space:nowrap">'+rp(x.s)+'</b></div>').join('')+(at.length>5?'<div class="note" style="margin-top:6px">+'+(at.length-5)+' akun lainnya</div>':''):'<div class="note" style="color:var(--green);font-weight:600">'+(sa.length?'Semua akun aman ✓':'Belum ada akun iklan.')+'</div>');
+  $('#tAg').innerHTML=ag.map((g,i)=>{const s=st[i];return `<tr><td><b>${esc(g)}</b></td><td class="r">${rp(s.awalAg)}</td><td class="r">${rp(s.depP)}</td><td class="r">${rp(s.topAkP)}</td><td class="r"><b>${rp(s.saldo)}</b></td><td class="r">${rp(s.awalAk)}</td><td class="r">${rp(s.spdP)}</td><td class="r"><b>${rp(s.sisaAk)}</b></td>${['hutang','titip'].map(k=>{const v=outAmt(k,g);return `<td class="r">${v>0?`<span class="tag ${k==='hutang'?'bad':'warn'}">${rp(v)}</span>`:'<span class="note">-</span>'}</td>`}).join('')}</tr>`}).join('')||'<tr><td colspan="10" class="note">Belum ada agensi — tambahkan di menu Top Up Agensi.</td></tr>';
   if(chart)chart.destroy();
   const cs=getComputedStyle(document.documentElement),tc=cs.getPropertyValue('--muted').trim(),gc=cs.getPropertyValue('--line').trim();
   chart=new Chart($('#ch'),{type:'bar',data:{labels:ag,datasets:[{label:'Top Up Agensi',data:st.map(s=>s.depP),backgroundColor:'#22C55E'},{label:'Top Up ke Akun',data:st.map(s=>s.topAkP),backgroundColor:'#38BDF8'},{label:'Spend',data:st.map(s=>s.spdP),backgroundColor:'#A78BFA'}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tc}}},scales:{x:{ticks:{color:tc},grid:{color:gc}},y:{beginAtZero:true,suggestedMax:1000000,ticks:{color:tc,maxTicksLimit:6,callback:v=>v>=1e6?'Rp '+Number((v/1e6).toFixed(1))+' jt':v>=1e3?'Rp '+Math.round(v/1e3)+' rb':'Rp '+Math.round(v)},grid:{color:gc}}}}});
   // agensi page
   $('#agList').innerHTML=D.agensi.map(g=>`<span class="tag ${g.aktif==='tidak'?'warn':'ok'}">${esc(g.nama)} · PPN ${+g.ppn||0}% <a href="#" data-ppnag="${esc(g.nama)}" title="Ubah PPN" style="color:inherit;text-decoration:none">✎</a> <a href="#" data-delag="${esc(g.nama)}" style="color:inherit;text-decoration:none">✕</a></span>`).join('');
-  $('#tTa').innerHTML=D.tpagensi.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>{const st=x.status||'lunas',sr=st==='lunas'?0:sisaRef(x);return `<tr><td>${esc(x.tanggal)}</td><td>${esc(x.agensi)}</td><td class="r">${rp(x.nominal)}</td><td><span class="tag ${STC[st]||'ok'}">${STL[st]||'Lunas'}${sr>0?' · sisa '+rp(sr):st==='lunas'?'':' · selesai'}</span>${x.pihak?' <span class="note">'+esc(x.pihak)+'</span>':''}</td><td>${esc(x.catatan)}</td><td><button class="btn del" data-deltp="tpagensi" data-id="${esc(x.id)}">Hapus</button></td></tr>`}).join('')||'<tr><td colspan="6" class="note">Tidak ada top up pada periode ini.</td></tr>';
+  pager('tTa',D.tpagensi.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>{const st=x.status||'lunas',sr=st==='lunas'?0:sisaRef(x);return `<tr><td>${esc(x.tanggal)}</td><td>${esc(x.agensi)}</td><td class="r">${rp(x.nominal)}</td><td><span class="tag ${STC[st]||'ok'}">${STL[st]||'Lunas'}${sr>0?' · sisa '+rp(sr):st==='lunas'?'':' · selesai'}</span>${x.pihak?' <span class="note">'+esc(x.pihak)+'</span>':''}</td><td>${esc(x.catatan)}</td><td><button class="btn del" data-deltp="tpagensi" data-id="${esc(x.id)}">Hapus</button></td></tr>`}),'<tr><td colspan="6" class="note">Tidak ada top up pada periode ini.</td></tr>');
     // akun page
   renderAkCards();
-    $('#tTk').innerHTML=D.tpakun.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.akun)}</td><td class="r">${rp(x.nominal)}</td><td>${esc(x.catatan)}</td><td><button class="btn del" data-deltp="tpakun" data-id="${esc(x.id)}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="5" class="note">Kosong.</td></tr>';
-  $('#tSp').innerHTML=D.spend.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.akun)}</td><td class="r">${rp(x.spend)}</td><td class="r">${x.spendppn?(+x.ppn||0)+'%':'-'}</td><td class="r"><b>${rp(spv(x))}</b></td><td><button class="btn del" data-delsp="${esc(x.tanggal)}|${esc(x.akun)}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="6" class="note">Kosong.</td></tr>';
+    pager('tTk',D.tpakun.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.akun)}</td><td class="r">${rp(x.nominal)}</td><td>${esc(x.catatan)}</td><td><button class="btn del" data-deltp="tpakun" data-id="${esc(x.id)}">Hapus</button></td></tr>`),'<tr><td colspan="5" class="note">Kosong.</td></tr>');
+  pager('tSp',D.spend.filter(x=>inP(x.tanggal)).sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(x.akun)}</td><td class="r">${rp(x.spend)}</td><td class="r">${x.spendppn?(+x.ppn||0)+'%':'-'}</td><td class="r"><b>${rp(spv(x))}</b></td><td><button class="btn del" data-delsp="${esc(x.tanggal)}|${esc(x.akun)}">Hapus</button></td></tr>`),'<tr><td colspan="6" class="note">Kosong.</td></tr>');
   const ots=D.tpagensi.filter(x=>x.status==='hutang'||x.status==='titip');
   $('#htKpi').innerHTML=[['Hutang Belum Lunas',rp(outAmt('hutang'))],['Titipan Belum Selesai',rp(outAmt('titip'))],['Jumlah Item Belum Selesai',ots.filter(x=>sisaRef(x)>0).length]].map(x=>`<div class="card kpi"><div class="l">${x[0]}</div><div class="v">${x[1]}</div></div>`).join('');
-  $('#tHt').innerHTML=[...ots].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>{const s=sisaRef(x);return `<tr><td>${esc(x.tanggal)}</td><td>${esc(x.agensi)}</td><td><span class="tag ${STC[x.status]}">${STL[x.status]}</span></td><td>${esc(x.pihak)}</td><td class="r">${rp(x.nominal)}</td><td class="r">${rp(x.nominal-s)}</td><td class="r"><b style="color:var(--${s>0?'red':'green'})">${s>0?rp(s):'Selesai'}</b></td></tr>`}).join('')||'<tr><td colspan="7" class="note">Belum ada top up berstatus hutang/titip.</td></tr>';
+  $('#tHt').innerHTML=[...ots].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>{const s=sisaRef(x);return `<tr><td>${esc(x.tanggal)}</td><td>${esc(x.agensi)}</td><td><span class="tag ${STC[x.status]}">${STL[x.status]}</span></td><td>${esc(x.pihak)}</td><td class="r">${rp(x.nominal)}</td><td class="r">${rp(x.nominal-s)}</td><td class="r"><b style="color:var(--${s>0?'red':'green'})">${s>0?rp(s):'Selesai'}</b></td><td>${s>0?`<button class="btn sec" data-plfull="${esc(x.id)}">✓ Selesai</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="8" class="note">Belum ada top up berstatus hutang/titip.</td></tr>';
   const lbl=r=>{const x=D.tpagensi.find(t=>t.id===r);return x?x.tanggal+' · '+x.agensi+' · '+STL[x.status]+' '+(x.pihak||''):'(top up dihapus)'};
   $('#tPl').innerHTML=[...D.pelunasan].sort((a,b)=>b.tanggal.localeCompare(a.tanggal)).map(x=>`<tr><td>${esc(x.tanggal)}</td><td>${esc(lbl(x.ref))}</td><td class="r">${rp(x.nominal)}</td><td>${esc(x.catatan)}</td><td><button class="btn del" data-delpl="${esc(x.id)}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="5" class="note">Belum ada pelunasan.</td></tr>';
-  const cr=$('#plRef').value;$('#plRef').innerHTML=ots.filter(x=>sisaRef(x)>0).map(x=>`<option value="${esc(x.id)}">${esc(x.tanggal+' · '+x.agensi+' · '+STL[x.status]+' '+(x.pihak||'')+' · sisa '+rp(sisaRef(x)))}</option>`).join('');if(cr)$('#plRef').value=cr;
   const bl=$('#sbBln').value||iso(new Date()).slice(0,7),st0=bl+'-01';
   const rows=[...agNames().map(n=>['agensi',n]),...D.akun.map(a=>['akun',a.nama])];
   $('#tSbView').innerHTML=rows.map(([k,n])=>{const an=D.saldoawal.find(x=>x.jenis===k&&same(x.nama,n)&&x.bulan.slice(0,10)===st0);
@@ -340,32 +413,39 @@ function parseRp(s){s=String(s==null?'':s).toLowerCase().replace(/rp/g,'').repla
 const num=id=>parseRp($(id).value);
 function parseRpN(s){const t=String(s==null?'':s).toLowerCase().replace(/rp/g,'').replace(/\s/g,'');const neg=/^[-\u2212\u2013]/.test(t)||/^\(.*\)$/.test(t);return (neg?-1:1)*parseRp(t.replace(/^[-\u2212\u2013(]+/,'').replace(/\)$/,''))}
 document.addEventListener('click',async e=>{
-  const t=e.target.closest('[data-p],[data-deltp],[data-delsp],[data-delag],[data-delak],[data-delsb],[data-ppnag],[data-delpl],[data-aktab],[data-akmode]');if(!t)return;
+  const t=e.target.closest('[data-p],[data-deltp],[data-delsp],[data-delag],[data-delak],[data-delsb],[data-ppnag],[data-delpl],[data-plfull],[data-pg],[data-aktab],[data-akmode],[data-akgrid]');if(!t)return;
   const d=t.dataset;
+  if(d.akgrid){$$('.seg button').forEach(b=>b.classList.toggle('on',b===t));$('#akg-sp').classList.toggle('on',d.akgrid==='sp');$('#akg-tp').classList.toggle('on',d.akgrid==='tp');akIns();return}
   if(d.akmode){setAkMode(d.akmode);return}
+  if(d.pg){const[i,dl]=d.pg.split(':');PG[i].p+=+dl;pager(i);return}
   if(d.aktab!==undefined){akTab=d.aktab;try{localStorage.setItem('saldoIklanAkTab',akTab)}catch(e){}renderAkCards();return}
   if(d.p){$$('.nav').forEach(n=>n.classList.toggle('on',n===t));$$('.page').forEach(p=>p.classList.toggle('on',p.id==='p-'+d.p));if(d.p==='akun'||d.p==='saldo')renderGrid();return}
   e.preventDefault();
   if(d.deltp){if(!confirm('Hapus catatan ini?'))return;D[d.deltp]=D[d.deltp].filter(x=>x.id!==d.id);save();renderAll();push(d.deltp,{id:d.id,hapus:true})}
-  if(d.delsp){const[tg,ak]=d.delsp.split('|');D.spend=D.spend.filter(x=>!(x.tanggal===tg&&x.akun===ak));save();renderAll();push('spend',{tanggal:tg,akun:ak,hapus:true})}
+  if(d.delsp){const k=d.delsp.indexOf('|'),tg=d.delsp.slice(0,k),ak=d.delsp.slice(k+1);D.spend=D.spend.filter(x=>!(x.tanggal===tg&&x.akun===ak));save();renderAll();push('spend',{tanggal:tg,akun:ak,hapus:true})}
   if(d.delag){if(!confirm('Hapus agensi "'+d.delag+'"? Riwayat top up tetap tersimpan.'))return;D.agensi=D.agensi.filter(x=>x.nama!==d.delag);save();renderAll();push('agensi',{nama:d.delag,hapus:true})}
   if(d.ppnag){const g=D.agensi.find(x=>x.nama===d.ppnag),v=prompt('PPN agensi '+d.ppnag+' (%). Berlaku untuk spend yang diinput SETELAH ini; spend lama tidak berubah.',+g.ppn||0);if(v===null)return;g.ppn=Math.max(0,+v||0);save();renderAll();push('agensi',g)}
+  if(d.plfull){const x=D.tpagensi.find(t=>t.id===d.plfull),v=x?sisaRef(x):0;if(v<=0)return;if(!confirm('Tandai selesai? Sisa '+rp(v)+' ('+STL[x.status].toLowerCase()+' '+(x.pihak||x.agensi)+') dianggap sudah dibayar/dikembalikan.'))return;const o={id:uid(),tanggal:iso(new Date()),ref:x.id,nominal:v,catatan:'Diselesaikan'};D.pelunasan.push(o);save();renderAll();toast('Ditandai selesai');push('pelunasan',o)}
   if(d.delpl){if(!confirm('Hapus pelunasan ini?'))return;D.pelunasan=D.pelunasan.filter(x=>x.id!==d.delpl);save();renderAll();push('pelunasan',{id:d.delpl,hapus:true})}
-  if(d.delsb){const[b,j,n]=d.delsb.split('|');D.saldoawal=D.saldoawal.filter(x=>!(x.bulan===b&&x.jenis===j&&x.nama===n));save();renderAll();push('saldoawal',{bulan:b,jenis:j,nama:n,hapus:true})}
+  if(d.delsb){const p=d.delsb.split('|'),b=p[0],j=p[1],n=p.slice(2).join('|');D.saldoawal=D.saldoawal.filter(x=>!(x.bulan===b&&x.jenis===j&&x.nama===n));save();renderAll();push('saldoawal',{bulan:b,jenis:j,nama:n,hapus:true})}
   if(d.delak){if(!confirm('Hapus akun "'+d.delak+'"?'))return;D.akun=D.akun.filter(x=>x.nama!==d.delak);save();renderAll();push('akun',{nama:d.delak,hapus:true})}
 });
 $('#agAdd').onclick=()=>{const n=$('#agNew').value.trim();if(!n)return;if(D.agensi.some(x=>same(x.nama,n)))return toast('Agensi sudah ada');
   const o={nama:n,aktif:'ya',ppn:Math.max(0,+$('#agPpn').value||0)};D.agensi.push(o);save();$('#agNew').value='';$('#agPpn').value=0;renderAll();push('agensi',o)};
 $('#akAdd').onclick=()=>{const n=$('#akNew').value.trim(),g=$('#akAg').value;if(!n||!g)return toast('Isi nama akun & pilih agensi');if(D.akun.some(x=>same(x.nama,n)))return toast('Akun sudah ada');
   const o={nama:n,agensi:g,aktif:'ya'};D.akun.push(o);save();$('#akNew').value='';renderAll();push('akun',o)};
-$('#taSave').onclick=()=>{const o={id:uid(),tanggal:$('#taTgl').value,agensi:$('#taAg').value,nominal:num('#taNom'),catatan:$('#taCat').value.trim(),status:$('#taSt').value,pihak:$('#taPh').value.trim()};
-  if(o.status!=='lunas'&&!o.pihak)return toast('Isi nama pihak untuk hutang/titip');
-  if(!o.agensi||!o.tanggal||o.nominal<=0)return toast('Lengkapi agensi, tanggal & nominal');
-  D.tpagensi.push(o);save();$('#taNom').value=$('#taCat').value=$('#taPh').value='';$('#taSt').value='lunas';renderAll();toast('Top up agensi tersimpan');push('tpagensi',o)};
-$('#plRef').onchange=()=>{const x=D.tpagensi.find(t=>t.id===$('#plRef').value);if(x)$('#plNom').value=sisaRef(x)};
-$('#plSave').onclick=()=>{const ref=$('#plRef').value,x=D.tpagensi.find(t=>t.id===ref),v=num('#plNom');if(!x||!$('#plTgl').value||v<=0)return toast('Pilih top up, tanggal & nominal');
-  if(v>sisaRef(x)&&!confirm('Nominal melebihi sisa ('+rp(sisaRef(x))+'). Tetap simpan?'))return;
-  const o={id:uid(),tanggal:$('#plTgl').value,ref,nominal:v,catatan:$('#plCat').value.trim()};D.pelunasan.push(o);save();$('#plNom').value=$('#plCat').value='';renderAll();toast('Pelunasan tersimpan');push('pelunasan',o)};
+function taUpd(){const st=$('#taSt').value,n=num('#taNom'),p=st==='lunas'?0:num('#taPart'),h=(!p||p>=n)?n:p;$('#taPartL').style.display=st==='lunas'?'none':'';
+  $('#taPrev').textContent=n>0?'Saldo agensi bertambah '+rp(n)+(st==='lunas'?'':' → '+(n-h>0?'Lunas '+rp(n-h)+' + ':'')+STL[st]+' '+rp(h)):''}
+['#taSt','#taNom','#taPart'].forEach(i=>$(i).addEventListener('input',taUpd));$('#taSt').addEventListener('change',taUpd);
+$('#taSave').onclick=()=>{const base={tanggal:$('#taTgl').value,agensi:$('#taAg').value,catatan:$('#taCat').value.trim()},nom=num('#taNom'),st=$('#taSt').value,ph=$('#taPh').value.trim();
+  let part=st==='lunas'?0:num('#taPart');if(st!=='lunas'&&(!part||part>=nom))part=nom;
+  if(st!=='lunas'&&!ph)return toast('Isi nama pihak untuk hutang/titip');
+  if(!base.agensi||!base.tanggal||nom<=0)return toast('Lengkapi agensi, tanggal & nominal');
+  const os=[];if(st==='lunas')os.push({...base,id:uid(),nominal:nom,status:'lunas',pihak:''});
+  else{if(nom-part>0)os.push({...base,id:uid(),nominal:nom-part,status:'lunas',pihak:''});os.push({...base,id:uid(),nominal:part,status:st,pihak:ph})}
+  D.tpagensi.push(...os);save();$('#taNom').value=$('#taCat').value=$('#taPh').value=$('#taPart').value='';$('#taSt').value='lunas';taUpd();renderAll();
+  toast('Top up agensi tersimpan'+(os.length>1?' (dipecah: lunas + '+STL[st].toLowerCase()+')':''));os.forEach(o=>push('tpagensi',o))};
+
 $('#sbBln').onchange=()=>{renderAll();renderGrid('awal')};
 $('#sbAuto').onclick=async()=>{const m=$('#sbBln').value;if(!m)return toast('Pilih bulan dulu');const st0=m+'-01';
   const rows=[...agNames().map(n=>['agensi',n]),...D.akun.map(a=>['akun',a.nama])].filter(([k,n])=>!D.saldoawal.some(x=>x.jenis===k&&same(x.nama,n)&&x.bulan.slice(0,10)===st0));
@@ -408,7 +488,7 @@ function renderGrid(kind){
       return `<tr data-k="${esc(n)}" data-j="${k}" data-ag="${esc(ag)}"><td>${k==='agensi'?'Agensi':'Akun iklan'}</td><td><b>${esc(n)}</b></td><td class="r">${rp(balAt(k,n,t))}</td><td class="r">${inp(an&&an.nominal,'otomatis')}</td></tr>`}).join('');
   }
   if(!B.innerHTML)B.innerHTML='<tr><td colspan="5" class="note">Belum ada akun/agensi — tambahkan dulu.</td></tr>';
-  agFilter(kind);
+  agFilter(kind);akDirty();
 }
 function agFilter(k){const v=$('#gAg-'+(k==='awal'?'awal':'akun')).value;$$('#gBody-'+k+' tr[data-ag]').forEach(r=>r.style.display=(!v||r.dataset.ag===v)?'':'none')}
 const PEND=[];
@@ -444,7 +524,7 @@ document.addEventListener('input',e=>{const t=e.target;if(!t.classList||!t.class
 document.addEventListener('focusin',e=>{if(e.target.classList&&e.target.classList.contains('gi'))e.target.select()});
 document.addEventListener('focusout',e=>{const t=e.target;if(t.matches&&t.matches('[data-money]')&&t.value.trim()){const aw=!!t.closest('#gBody-awal'),v=aw?parseRpN(t.value):parseRp(t.value);if(v>0||(aw&&v<0))t.value=fmtN(v)}});
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const t=e.target;
-  if(t.classList&&t.classList.contains('gi')){e.preventDefault();const all=[...t.closest('tbody').querySelectorAll('.gi')].filter(i=>i.closest('tr').style.display!=='none'),n=all[all.indexOf(t)+1];(n||t.closest('.ts').nextElementSibling.querySelector('[data-gsave]')).focus();return}
+  if(t.classList&&t.classList.contains('gi')){e.preventDefault();const all=[...t.closest('tbody').querySelectorAll('.gi')].filter(i=>i.closest('tr').style.display!=='none'),n=all[all.indexOf(t)+1];(n||(t.closest('.ts').nextElementSibling||t.closest('.page')).querySelector('[data-gsave]')).focus();return}
   const f=t.closest&&t.closest('.card.form');if(f&&t.tagName==='INPUT'){const b=f.querySelector('.btn:not(.sec)');if(b){e.preventDefault();b.click()}}});
 const APPS_SCRIPT_CODE="// ============================================================\n// APPS SCRIPT — DASHBOARD SALDO IKLAN\n// Extensions > Apps Script > tempel > Deploy > New deployment > Web app\n// Execute as: Me | Who has access: Anyone -> salin URL /exec ke dashboard (menu Integrasi)\n// Sheet dibuat OTOMATIS kalau belum ada (tidak perlu bikin manual).\n// Agensi & Akun digabung di 1 sheet 'Master'. Data dari sheet lama 'Agensi'/'Akun'\n// disalin otomatis ke Master saat Master masih kosong (setelah itu sheet lama boleh dihapus).\n// ============================================================\nvar CFG = {\n  master:   {s:'Master',      h:['jenis','nama','agensi','ppn','aktif'],          k:['jenis','nama']},\n  tpagensi: {s:'TopUpAgensi', h:['id','tanggal','agensi','nominal','catatan','status','pihak'], k:['id']},\n  tpakun:   {s:'TopUpAkun',   h:['id','tanggal','akun','nominal','catatan'],        k:['id']},\n  spend:    {s:'SpendAkun',   h:['tanggal','akun','spend','ppn','spendppn'],      k:['tanggal','akun']},\n  pelunasan:{s:'Pelunasan',   h:['id','tanggal','ref','nominal','catatan'],        k:['id']},\n  saldoawal:{s:'SaldoAwal',   h:['bulan','jenis','nama','nominal'],                 k:['bulan','jenis','nama']}\n};\n\nfunction out(o){ return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }\nfunction norm(v){ return fmtCell(v).toLowerCase(); }\nfunction fmtCell(v){\n  if(Object.prototype.toString.call(v)==='[object Date]')\n    return Utilities.formatDate(v, SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone(), 'yyyy-MM-dd');\n  return String(v).trim();\n}\nfunction ensure(ss, c){\n  var sh = ss.getSheetByName(c.s);\n  if(!sh){ sh = ss.insertSheet(c.s); sh.appendRow(c.h); sh.setFrozenRows(1); return sh; }\n  // sheet lama: tambahkan kolom header yang belum ada (mis. ppn, spendppn)\n  var hd = sh.getRange(1,1,1,Math.max(1,sh.getLastColumn())).getValues()[0].map(function(x){return String(x).toLowerCase().trim();});\n  c.h.forEach(function(col){ if(hd.indexOf(col) < 0){ sh.getRange(1, hd.length+1).setValue(col); hd.push(col); } });\n  return sh;\n}\nvar MASTER_TYPES = {agensi:1, akun:1};\nfunction migrate(ss, master){\n  if(master.getLastRow() > 1) return;\n  [{n:'Agensi', j:'agensi'}, {n:'Akun', j:'akun'}].forEach(function(o){\n    var sh = ss.getSheetByName(o.n);\n    if(!sh || sh.getLastRow() < 2) return;\n    toObjects(sh).forEach(function(r){\n      if(!r.nama) return;\n      master.appendRow([o.j, r.nama, o.j==='akun' ? (r.agensi||'') : '', o.j==='agensi' ? (r.ppn||0) : '', r.aktif||'']);\n    });\n  });\n}\nfunction toObjects(sh){\n  var rows = sh.getDataRange().getValues(), hd = rows[0].map(function(h){return String(h).toLowerCase().trim();}), res = [];\n  for(var i=1;i<rows.length;i++){ var o={}; hd.forEach(function(h,j){ o[h]=fmtCell(rows[i][j]); }); res.push(o); }\n  return res;\n}\n\nfunction doGet(e){\n  var lock = LockService.getScriptLock(), got = false;\n  try{\n    got = lock.tryLock(15000);\n    var ss = SpreadsheetApp.getActiveSpreadsheet(), res = {};\n    Object.keys(CFG).forEach(function(t){\n      var sh = ensure(ss, CFG[t]);\n      if(t==='master') migrate(ss, sh);\n      res[t] = toObjects(sh);\n    });\n    var m = res.master; delete res.master;\n    res.agensi = m.filter(function(o){return o.jenis==='agensi';}).map(function(o){return {nama:o.nama, aktif:o.aktif, ppn:o.ppn};});\n    res.akun   = m.filter(function(o){return o.jenis==='akun';}).map(function(o){return {nama:o.nama, agensi:o.agensi, aktif:o.aktif};});\n    return out(res);\n  }catch(err){\n    return out({error:'doGet gagal: '+(err&&err.message?err.message:err)});\n  }finally{ if(got) lock.releaseLock(); }\n}\n\nfunction doPost(e){\n  var lock = LockService.getScriptLock();\n  try{ lock.waitLock(30000); }catch(x){ return out({status:'error', message:'Server sibuk, coba lagi.'}); }\n  try{\n    var d = JSON.parse(e.postData.contents), type = d.type;\n    if(MASTER_TYPES[type]){ d.jenis = type; type = 'master'; }\n    var c = CFG[type];\n    if(!c) return out({status:'error', message:'type tidak dikenal: '+d.type});\n    var ss = SpreadsheetApp.getActiveSpreadsheet(), sh = ensure(ss, c);\n    if(type==='master') migrate(ss, sh);\n    var rows = sh.getDataRange().getValues();\n    var idx = c.k.map(function(k){ return c.h.indexOf(k); }); // kunci selalu di kolom awal\n    var hdr = sh.getRange(1,1,1,sh.getLastColumn()).getValues()[0].map(function(x){return String(x).toLowerCase().trim();});\n    var vals = hdr.map(function(h){ return d[h]==null ? '' : d[h]; });\n    for(var i=1;i<rows.length;i++){\n      var same = idx.every(function(ci, n){ return norm(rows[i][ci]) === String(d[c.k[n]]==null?'':d[c.k[n]]).trim().toLowerCase(); });\n      if(same){\n        if(d.hapus) sh.deleteRow(i+1); else sh.getRange(i+1,1,1,vals.length).setValues([vals]);\n        return out({status:'ok'});\n      }\n    }\n    if(!d.hapus) sh.appendRow(vals);\n    return out({status:'ok'});\n  }catch(err){\n    return out({status:'error', message:String(err&&err.message?err.message:err)});\n  }finally{ lock.releaseLock(); }\n}\n\n// STRUKTUR SHEET (otomatis):\n// Master      : jenis | nama | agensi | ppn | aktif       (jenis = agensi / akun)\n//               baris agensi: isi nama + ppn (%, beda tiap agensi)\n//               baris akun  : isi nama + agensi (pemilik); ppn kosong\n//               aktif = 'tidak' untuk menyembunyikan\n// TopUpAgensi : id | tanggal | agensi | nominal | catatan  (setoran saldo ke agensi)\n// TopUpAkun   : id | tanggal | akun | nominal | catatan    (saldo dialokasikan ke akun iklan)\n// SpendAkun   : tanggal | akun | spend | ppn | spendppn                    (upsert per tanggal+akun)\n// SaldoAwal   : bulan (yyyy-MM-01) | jenis (agensi/akun) | nama | nominal   (patokan saldo awal per bulan)\n// Pelunasan   : id | tanggal | ref (id TopUpAgensi) | nominal | catatan   (pelunasan hutang / penyelesaian titipan)\n// TopUpAgensi punya kolom status (lunas/hutang/titip) & pihak.\n// Sisa saldo akun = total TopUpAkun - total SpendAkun | Saldo agensi = TopUpAgensi - TopUpAkun milik agensi itu\n";
 $('#scriptCode').textContent=APPS_SCRIPT_CODE;
@@ -452,7 +532,7 @@ $('#bShowScript').onclick=()=>{const b=$('#scriptBox'),v=b.style.display!=='none
 $('#bCopyScript').onclick=()=>navigator.clipboard.writeText(APPS_SCRIPT_CODE).then(()=>toast('Kode Apps Script disalin'));
 /* init */
 const now=new Date();$('#sbBln').value=iso(now).slice(0,7);$('#dFrom').value=iso(new Date(now.getFullYear(),now.getMonth(),1));$('#dTo').value=iso(now);
-['#taTgl','#plTgl','#gTgl-akun'].forEach(s=>$(s).value=iso(now));
+['#taTgl','#gTgl-akun'].forEach(s=>$(s).value=iso(now));
 renderAll();renderGrid();
 if(S.url)pull(true);else setSt('sim','Mode lokal (belum terhubung)');
 </script>
