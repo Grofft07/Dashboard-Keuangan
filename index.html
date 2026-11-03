@@ -6,6 +6,7 @@
 <title>Dashboard Saldo Iklan</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#0F1115;--panel:#171B22;--panel-2:#1D222B;--line:#2A3040;--text:#E7E9EE;--muted:#8B93A7;--green:#22C55E;--greendark:#15803D;--yellow:#F5C518;--red:#EF4444;--blue:#38BDF8;--purple:#A78BFA;--th:#0B0F14;--kpi:linear-gradient(135deg,#0E3B26,#1D9A5C);color-scheme:dark}
 :root[data-theme=light]{--bg:#F4F8F6;--panel:#fff;--panel-2:#EEF6F1;--line:#DCE7E1;--text:#12161C;--muted:#5B6577;--green:#16A34A;--greendark:#166534;--yellow:#B8860B;--red:#D7384F;--blue:#2B6FE0;--purple:#7A56E0;--th:#fff;color-scheme:light}
@@ -192,7 +193,7 @@ td.r,th.r{text-align:right}
       <label>Nomor WA tujuan (62…)<input id="lpPhone" placeholder="628123456789"></label>
     </div>
     <div class="card" style="margin-top:14px"><textarea id="lpTxt"></textarea>
-      <div class="bar" style="margin-top:12px"><button class="btn wa" id="lpWa">Kirim via WhatsApp</button><button class="btn sec" id="lpCopy">📋 Salin Teks</button><button class="btn sec" id="lpReset">Susun Ulang</button></div></div>
+      <div class="bar" style="margin-top:12px"><button class="btn wa" id="lpWa">Kirim via WhatsApp</button><button class="btn sec" id="lpCopy">📋 Salin Teks</button><button class="btn sec" id="lpXls">📊 Ekspor Excel</button><button class="btn sec" id="lpReset">Susun Ulang</button></div></div>
   </div>
 
   <div class="page" id="p-integrasi">
@@ -453,6 +454,24 @@ $('#sbAuto').onclick=async()=>{const m=$('#sbBln').value;if(!m)return toast('Pil
   const os=rows.map(([k,n])=>({bulan:st0,jenis:k,nama:n,nominal:balAt(k,n,st0)}));D.saldoawal.push(...os);save();renderAll();toast(os.length+' patokan dibuat');for(const o of os)await push('saldoawal',o)};
 ['#lpAg','#lpDet','#dFrom','#dTo'].forEach(s=>$(s).addEventListener('change',()=>{renderAll();renderGrid()}));
 $('#lpReset').onclick=buildReport;
+function exportXls(){
+  if(typeof XLSX==='undefined')return toast('Library Excel belum termuat, cek koneksi internet');
+  const only=$('#lpAg').value,ag=agNames().filter(g=>!only||g===only),f=$('#dFrom').value,e=$('#dTo').value;
+  const R=[['Agensi','Saldo Awal Agensi','Top Up Agensi','Dialokasi ke Akun','Saldo Akhir Agensi','Saldo Awal Akun','Spend + PPN','Sisa Saldo Akun','Hutang Belum Lunas','Titipan Belum Selesai']];
+  const A=[['Agensi','Akun Iklan','Saldo Awal','Top Up Periode','Spend + PPN Periode','Sisa Saldo','Status']];
+  const T=Array(9).fill(0);
+  ag.forEach(g=>{const s=agStat(g),hu=outAmt('hutang',g),ti=outAmt('titip',g),v=[s.awalAg,s.depP,s.topAkP,s.saldo,s.awalAk,s.spdP,s.sisaAk,hu,ti];
+    v.forEach((x,i)=>T[i]+=x);R.push([g,...v]);
+    s.aks.forEach(a=>{const k=akStat(a);A.push([g,a.nama,k.awal,k.topP,k.spdP,k.sisa,k.sisa<=0?'Habis':k.sisa<minS()?'Menipis':'Aman'])})});
+  R.push(['TOTAL',...T]);
+  const H=[['Laporan Saldo Iklan'],['Periode',f+' s/d '+e],['Agensi',only||'Semua agensi']];
+  const wb=XLSX.utils.book_new(),w1=XLSX.utils.aoa_to_sheet([...H,[],...R]),w2=XLSX.utils.aoa_to_sheet(A);
+  w1['!cols']=[{wch:22},...Array(9).fill({wch:20})];w2['!cols']=[{wch:22},{wch:28},{wch:18},{wch:18},{wch:20},{wch:18},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,w1,'Ringkasan Agensi');XLSX.utils.book_append_sheet(wb,w2,'Rincian Akun');
+  XLSX.writeFile(wb,'Laporan_Saldo_Iklan_'+f+'_sd_'+e+'.xlsx');toast('File Excel diunduh');
+}
+$('#lpXls').onclick=exportXls;
+
 $('#lpPhone').value=S.phone||'';$('#lpPhone').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'');S.phone=e.target.value;save()};
 $('#lpWa').onclick=()=>{const p=$('#lpPhone').value.replace(/\D/g,'');window.open('https://wa.me/'+p+'?text='+encodeURIComponent($('#lpTxt').value),'_blank')};
 $('#lpCopy').onclick=()=>navigator.clipboard.writeText($('#lpTxt').value).then(()=>toast('Teks laporan disalin'));
