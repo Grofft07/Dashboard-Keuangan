@@ -156,6 +156,28 @@ tr.flash td{animation:flashrow 1.3s ease-out}@keyframes flashrow{0%,55%{backgrou
 #akp-in .akwrap>.ins{position:static;height:auto;min-height:0;max-height:none;overflow-y:auto;margin-top:0 !important}
 .ins .rk .nm small{white-space:normal;line-height:1.35}
 @media(max-width:1100px){#akp-in .akwrap{height:auto;min-height:0}#akp-in .akwrap .akg.on>.ts{max-height:70vh}#akp-in .akwrap>.ins{max-height:none}}
+
+/* ===== date picker ===== */
+.dpb{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);color:var(--text);cursor:pointer;font:inherit;font-weight:600;font-size:13.5px;white-space:nowrap;transition:border-color .15s,box-shadow .15s}
+.dpb:hover{border-color:var(--muted)}.dpb.open{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,197,94,.2)}.dpb em{font-style:normal;color:var(--green);font-weight:700}
+.dpop{position:absolute;z-index:1000;display:none;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.2);overflow:hidden;color:var(--text)}
+.dpop.show{display:flex}
+.dpp{width:158px;flex:none;border-right:1px solid var(--line);padding:12px 10px;display:flex;flex-direction:column;gap:3px;background:var(--panel)}
+.dpp button{text-align:left;padding:9px 12px;border-radius:9px;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:13px;cursor:pointer}
+.dpp button:hover{background:var(--panel-2);color:var(--text)}.dpp button.on{background:rgba(34,197,94,.16);color:var(--green)}
+.dpr{display:flex;flex-direction:column}
+.dpc{display:flex;gap:28px;padding:14px 20px 8px}
+.dpm{width:238px}
+.dph{position:relative;display:flex;align-items:center;justify-content:center;height:32px;font-weight:700;font-size:14px}
+.dpn{position:absolute;top:0;width:32px;height:32px;border:0;background:transparent;color:var(--muted);font-size:20px;border-radius:8px;cursor:pointer;line-height:1}.dpn:hover{background:var(--panel-2);color:var(--text)}.dpn.l{left:0}.dpn.r{right:0}
+.dpg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px 0;margin-top:6px}
+.dpg .w{font-size:11px;color:var(--muted);font-weight:700;text-align:center;padding:6px 0}
+.dpd{height:34px;border:0;background:transparent;color:var(--text);font:inherit;font-size:13px;border-radius:8px;cursor:pointer}
+.dpd:hover{background:var(--panel-2)}.dpd.td{box-shadow:inset 0 0 0 1px var(--green)}
+.dpd.in{background:rgba(34,197,94,.16);border-radius:0}.dpd.rs,.dpd.re{background:var(--green);color:#fff;font-weight:700;border-radius:8px}
+.dpd.in.rs{border-radius:8px 0 0 8px}.dpd.in.re{border-radius:0 8px 8px 0}
+.dpf{padding:6px 20px 12px;font-size:12px;color:var(--muted)}
+@media(max-width:700px){.dpop.show{flex-direction:column;max-width:calc(100vw - 16px)}.dpp{width:auto;flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--line)}.dpc{padding:12px 12px 6px}.dpm{width:100%}}
 </style>
 <script>try{if(localStorage.getItem('saldoTheme')!=='dark')document.documentElement.setAttribute('data-theme','light')}catch(e){document.documentElement.setAttribute('data-theme','light')}</script>
 </head>
@@ -255,8 +277,8 @@ tr.flash td{animation:flashrow 1.3s ease-out}@keyframes flashrow{0%,55%{backgrou
       <input id="url" style="width:100%;margin:6px 0 12px" placeholder="https://script.google.com/macros/s/XXXXX/exec">
       <label class="note">Batas saldo menipis (Rp) — akun di bawah ini ditandai ⚠️</label>
       <input type="number" id="minS" style="width:220px;margin:6px 0 14px;display:block">
-      <b>Jam cut-off laporan finance</b><div class="note">Satu periode = 17:00 kemarin s/d jam ini. Spend diinput dari 3 angka Ads Manager: (24 jam kemarin − kemarin s/d cut-off) + hari ini s/d cut-off; top up yang jamnya lewat cut-off otomatis dihitung ke periode (tanggal) berikutnya.</div>
-      <input type="time" id="cutJam" style="width:220px;margin:6px 0 14px;display:block">
+      <b>Jam cut-off laporan finance (per hari)</b><div class="note">Satu periode = cut-off hari sebelumnya s/d cut-off hari ini. Contoh: periode hari Sabtu = Jumat 17:00 s/d Sabtu 14:30. Spend diinput dari 3 angka Ads Manager: (24 jam kemarin − kemarin s/d cut-off) + hari ini s/d cut-off; top up yang jamnya lewat cut-off otomatis dihitung ke periode (tanggal) berikutnya.</div>
+      <div id="cutGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:8px;max-width:640px;margin:8px 0 14px"></div>
       <div class="bar"><button class="btn" id="bPull">Tarik Data dari Spreadsheet</button><button class="btn sec" id="bPush">Kirim Semua Data ke Spreadsheet</button><button class="btn sec" id="bShowScript">&lt;/&gt; Lihat Kode Apps Script</button></div>
       <div class="note" id="syncMsg" style="margin-top:10px">Belum ada sinkronisasi.</div>
       <div id="scriptBox" style="display:none;margin-top:16px">
@@ -290,7 +312,9 @@ const autoHut=g=>g?Math.max(0,-balAt('agensi',g,addDay($('#dTo').value,1))):D.ag
 const uid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
 const same=(a,b)=>String(a).trim().toLowerCase()===String(b).trim().toLowerCase();
 const minS=()=>+S.min||500000;
-const cutT=()=>S.cut||'17:00';
+const CUTD=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+/* jam cut-off per hari (getDay: 0=Min … 6=Sab). Default: 17:00, Sabtu 14:30 */
+const cutT=d=>{const i=(d?new Date(d+'T00:00:00'):new Date()).getDay();return (S.cuts&&S.cuts[i])||(i===6?'14:30':(S.cut||'17:00'))};
 const nowT=()=>new Date().toTimeString().slice(0,5);
 let chart;
 function save(){localStorage.setItem(K,JSON.stringify(D));localStorage.setItem(K+'s',JSON.stringify(S))}
@@ -301,7 +325,7 @@ const inP=t=>t>=$('#dFrom').value&&t<=$('#dTo').value;
 /* ---------- hitung ---------- */
 const addDay=(d,n)=>{const x=new Date(d+'T00:00:00');x.setDate(x.getDate()+n);return iso(x)};
 const rng=(t,a,b)=>t>=a&&t<b;
-const ed=x=>(x.jam&&x.jam>cutT())?addDay(x.tanggal,1):x.tanggal; /* top up setelah cut-off masuk periode berikutnya */
+const ed=x=>(x.jam&&x.jam>cutT(x.tanggal))?addDay(x.tanggal,1):x.tanggal; /* top up setelah cut-off masuk periode berikutnya */
 function flow(kind,name,a,b){
   if(kind==='akun')return sum(D.tpakun.filter(x=>same(x.akun,name)&&rng(ed(x),a,b)),'nominal')-sumSp(D.spend.filter(x=>same(x.akun,name)&&rng(x.tanggal,a,b)));
   const aks=D.akun.filter(k=>same(k.agensi,name)).map(k=>k.nama);
@@ -458,7 +482,7 @@ function renderAll(){
 function buildReport(){
   const only=$('#lpAg').value,det=$('#lpDet').value==='1',ag=agNames().filter(g=>!only||g===only);
   const f=d=>d.split('-').reverse().join('/');
-  let t='📊 *Laporan Saldo Iklan*\n🗓 '+f($('#dFrom').value)+' – '+f($('#dTo').value)+'\n⏱ Periode: '+cutT()+' '+f(addDay($('#dFrom').value,-1))+' s/d '+cutT()+' '+f($('#dTo').value)+'\n';
+  let t='📊 *Laporan Saldo Iklan*\n🗓 '+f($('#dFrom').value)+' – '+f($('#dTo').value)+'\n⏱ Periode: '+cutT(addDay($('#dFrom').value,-1))+' '+f(addDay($('#dFrom').value,-1))+' s/d '+cutT($('#dTo').value)+' '+f($('#dTo').value)+'\n';
   const T={awal:0,dep:0,spd:0,saldo:0,awalAk:0,sisa:0};
   ag.forEach(g=>{const s=agStat(g);T.awal+=s.awalAg;T.dep+=s.depP;T.spd+=s.spdP;T.saldo+=s.saldo;T.awalAk+=s.awalAk;T.sisa+=s.sisaAk;
     t+='\n*'+g+'*\n• Saldo awal agensi: '+rp(s.awalAg)+'\n• Top up agensi: '+rp(s.depP)+'\n• Dialokasi ke akun: '+rp(s.topAkP)+'\n• Saldo akhir agensi: '+rp(s.saldo)+'\n• Saldo awal akun: '+rp(s.awalAk)+'\n• Spend + PPN: '+rp(s.spdP)+'\n• Sisa saldo akun: '+rp(s.sisaAk)+'\n';
@@ -466,7 +490,7 @@ function buildReport(){
     if(det)s.aks.forEach(a=>{const k=akStat(a);t+='   – '+a.nama+': awal '+rp(k.awal)+' → sisa '+rp(k.sisa)+(k.sisa<=0?' ❌':k.sisa<minS()?' ⚠️ menipis':'')+'\n'})});
   t+='\n*TOTAL*\n• Saldo awal agensi: '+rp(T.awal)+'\n• Top up agensi: '+rp(T.dep)+'\n• Saldo akhir agensi: '+rp(T.saldo)+'\n• Saldo awal akun: '+rp(T.awalAk)+'\n• Spend + PPN: '+rp(T.spd)+'\n• Sisa saldo akun: '+rp(T.sisa);
   const tT=ag.reduce((s,g)=>s+titipAg(g),0),hT=ag.reduce((s,g)=>s+autoHut(g),0);if(tT)t+='\n• Titipan di agensi: '+rp(tT);if(hT)t+='\n• Hutang ke agensi: '+rp(hT);
-  {const e=$('#dTo').value,ct=cutT(),agSet=new Set(ag.map(x=>x.toLowerCase()));
+  {const e=$('#dTo').value,ct=cutT(e),agSet=new Set(ag.map(x=>x.toLowerCase()));
     const late=[...D.tpagensi.filter(x=>x.tanggal===e&&x.jam>ct&&agSet.has(String(x.agensi).toLowerCase())).map(x=>({j:x.jam,n:x.agensi+' (top up agensi)',v:+x.nominal||0})),
       ...D.tpakun.filter(x=>{const a=D.akun.find(k=>same(k.nama,x.akun));return x.tanggal===e&&x.jam>ct&&a&&agSet.has(String(a.agensi).toLowerCase())}).map(x=>({j:x.jam,n:x.akun+' (top up akun)',v:+x.nominal||0}))].sort((a,b)=>a.j.localeCompare(b.j));
     if(late.length)t+='\n\n⏰ *Masuk setelah cut-off '+ct+'* (dihitung ke periode berikutnya)\n'+late.map(x=>'• '+x.j+' '+x.n+': '+rp(x.v)).join('\n')}
@@ -520,7 +544,7 @@ function exportXls(){
     v.forEach((x,i)=>T[i]+=x);R.push([g,...v]);
     s.aks.forEach(a=>{const k=akStat(a);A.push([g,a.nama,k.awal,k.topP,k.spdP,k.sisa,k.sisa<=0?'Habis':k.sisa<minS()?'Menipis':'Aman'])})});
   R.push(['TOTAL',...T]);
-  const H=[['Laporan Saldo Iklan'],['Periode',cutT()+' '+addDay(f,-1)+' s/d '+cutT()+' '+e],['Agensi',only||'Semua agensi']];
+  const H=[['Laporan Saldo Iklan'],['Periode',cutT(addDay(f,-1))+' '+addDay(f,-1)+' s/d '+cutT(e)+' '+e],['Agensi',only||'Semua agensi']];
   const wb=XLSX.utils.book_new(),w1=XLSX.utils.aoa_to_sheet([...H,[],...R]),w2=XLSX.utils.aoa_to_sheet(A);
   w1['!cols']=[{wch:22},...Array(9).fill({wch:20})];w2['!cols']=[{wch:22},{wch:28},{wch:18},{wch:18},{wch:20},{wch:18},{wch:12}];
   XLSX.utils.book_append_sheet(wb,w1,'Ringkasan Agensi');XLSX.utils.book_append_sheet(wb,w2,'Rincian Akun');
@@ -533,7 +557,10 @@ $('#lpWa').onclick=()=>{const p=$('#lpPhone').value.replace(/\D/g,'');window.ope
 $('#lpCopy').onclick=()=>navigator.clipboard.writeText($('#lpTxt').value).then(()=>toast('Teks laporan disalin'));
 $('#url').value=S.url||'';$('#minS').value=minS();
 $('#url').onchange=e=>{S.url=e.target.value.trim();save();pull()};
-$('#cutJam').value=cutT();$('#cutJam').onchange=e=>{S.cut=e.target.value||'17:00';save();buildReport()};
+(function(){const g=$('#cutGrid');if(!g)return;const ord=[1,2,3,4,5,6,0],ref=new Date('2026-11-01T00:00:00');
+  g.innerHTML=ord.map(i=>`<label class="note" style="display:block">${CUTD[i]}<input type="time" data-cd="${i}" style="width:100%;margin-top:4px"></label>`).join('');
+  const fill=()=>{g.querySelectorAll('[data-cd]').forEach(x=>{const i=+x.dataset.cd,d=new Date(ref);d.setDate(1+(i-ref.getDay()+7)%7);x.value=(S.cuts&&S.cuts[i])||(i===6?'14:30':(S.cut||'17:00'))})};fill();
+  g.onchange=()=>{S.cuts=[0,1,2,3,4,5,6].map(i=>g.querySelector('[data-cd="'+i+'"]').value||(i===6?'14:30':'17:00'));save();buildReport();renderGrid();akIns&&akIns()}})();
 $('#minS').onchange=e=>{S.min=+e.target.value||0;save();renderAll()};
 $('#bPull').onclick=()=>{S.url=$('#url').value.trim();save();pull()};
 $('#bPush').onclick=()=>{S.url=$('#url').value.trim();save();if(!S.url)return toast('Isi URL dulu');pushAll()};
@@ -550,8 +577,8 @@ function renderGrid(kind){
   const t=gDate(kind),aks=D.akun.filter(a=>a.aktif!=='tidak').sort((a,b)=>String(a.agensi).localeCompare(b.agensi)||String(a.nama).localeCompare(b.nama)),H=$('#gHead-'+kind),B=$('#gBody-'+kind),inf=$('#gInfo-'+kind);
   const inp=(o,ph)=>`<input class="gi" data-money inputmode="decimal" data-orig="${o||''}" value="${fmtN(o)}" placeholder="${ph||''}" style="width:150px;text-align:right">`;
   if(kind==='spend'){
-    inf.textContent='Periode '+cutT()+' '+addDay(t,-1)+' s/d '+cutT()+' '+t+' · Total = (① − ②) + ③ · ② otomatis dari ③ kemarin · PPN otomatis';
-    H.innerHTML='<tr><th>Akun</th><th class="r">PPN</th><th class="r" title="00:00–24:00 tgl '+addDay(t,-1)+'"><span class="stp s1">1</span>24 jam kemarin</th><th class="r" title="00:00–'+cutT()+' tgl '+addDay(t,-1)+'"><span class="stp s2">2</span>Kemarin s/d '+cutT()+'</th><th class="r" title="00:00–'+cutT()+' tgl '+t+'"><span class="stp s3">3</span>Hari ini s/d '+cutT()+'</th><th class="r">Total + PPN</th></tr>';
+    inf.textContent='Periode '+cutT(addDay(t,-1))+' '+addDay(t,-1)+' s/d '+cutT(t)+' '+t+' · Total = (① − ②) + ③ · ② otomatis dari ③ kemarin · PPN otomatis';
+    H.innerHTML='<tr><th>Akun</th><th class="r">PPN</th><th class="r" title="00:00–24:00 tgl '+addDay(t,-1)+'"><span class="stp s1">1</span>24 jam kemarin</th><th class="r" title="00:00–'+cutT(addDay(t,-1))+' tgl '+addDay(t,-1)+'"><span class="stp s2">2</span>Kemarin s/d '+cutT(addDay(t,-1))+'</th><th class="r" title="00:00–'+cutT(t)+' tgl '+t+'"><span class="stp s3">3</span>Hari ini s/d '+cutT(t)+'</th><th class="r">Total + PPN</th></tr>';
     B.innerHTML=aks.map(a=>{const ex=D.spend.find(x=>x.tanggal===t&&same(x.akun,a.nama)),p=ppnOf(a.nama),nw=ex&&ex.h24!==undefined&&ex.h24!=='',lg=ex&&!nw&&((ex.kemarin!==undefined&&ex.kemarin!=='')||(ex.hari!==undefined&&ex.hari!=='')),v1=nw?+ex.h24||0:lg?+ex.kemarin||0:0,pv=!ex&&D.spend.find(x=>x.tanggal===addDay(t,-1)&&same(x.akun,a.nama)),au=pv&&pv.hari!==undefined&&pv.hari!==''&&+pv.hari>0,v3=nw?+ex.sdcut||0:(au?+pv.hari:0),v2=ex?((nw||lg)?+ex.hari||0:+ex.spend||0):0;
       return `<tr data-k="${esc(a.nama)}" data-ag="${esc(a.agensi)}" data-ppn="${p}"><td title="${esc(a.nama)}"><b>${esc(a.nama)}</b></td><td class="r">${p}%</td><td class="r">${inp(v1,'0').replace('class="gi"','class="gi g1"')}</td><td class="r">${(au?inp(v3,'0').replace('data-orig="'+v3+'"','data-orig="" data-auto="1" title="Otomatis dari ③ tanggal '+addDay(t,-1)+' — boleh diubah"'):inp(v3,'0')).replace('class="gi"','class="gi g3"')}</td><td class="r">${inp(v2,'0').replace('class="gi"','class="gi g2"')}</td><td class="tot" data-pot>${ex?potH(+ex.spend||0,p):'-'}</td></tr>`}).join('');spFilter();
   }else if(kind==='topup'){
@@ -574,7 +601,7 @@ async function gridSave(kind,q){
   const t=gDate(kind);if(!t){toast('Pilih tanggal/bulan');return 'cancel'}
   const rows=$$('#gBody-'+kind+' tr[data-k]'),os=[];let type;
   if(kind==='spend'){type='spend';const bad=[];rows.forEach(r=>{const I=['.g1','.g3','.g2'].map(s=>r.querySelector(s));if(!I[0].value.trim()&&!I[2].value.trim())return;const [a,c,b]=I.map(x=>parseRp(x.value));if(I.every(x=>parseRp(x.value)===+(x.dataset.orig||0)))return;if(c>a){bad.push(r.dataset.k);return}const kem=a-c,v=kem+b,p=+r.dataset.ppn||0;os.push({tanggal:t,akun:r.dataset.k,h24:a,sdcut:c,kemarin:kem,hari:b,spend:v,ppn:p,spendppn:Math.round(v*(1+p/100))})});
-    if(bad.length){toast('Spend kemarin s/d '+cutT()+' lebih besar dari 24 jam: '+bad.slice(0,3).join(', '));return 'cancel'}
+    if(bad.length){toast('Spend kemarin s/d '+cutT(addDay(t,-1))+' lebih besar dari 24 jam: '+bad.slice(0,3).join(', '));return 'cancel'}
     os.forEach(o=>{D.spend=D.spend.filter(x=>!(x.tanggal===o.tanggal&&same(x.akun,o.akun)));D.spend.push(o)})}
   else if(kind==='topup'){type='tpakun';rows.forEach(r=>{const v=parseRp(r.querySelector('.gi').value);if(v>0)os.push({id:uid(),tanggal:t,jam:$('#gJam-akun').value||nowT(),akun:r.dataset.k,nominal:v,catatan:r.querySelector('.gc').value.trim()})});
     const by={};os.forEach(o=>{const a=D.akun.find(x=>same(x.nama,o.akun));if(a)by[a.agensi]=(by[a.agensi]||0)+o.nominal});
@@ -616,6 +643,75 @@ $('#bCopyScript').onclick=()=>navigator.clipboard.writeText(APPS_SCRIPT_CODE).th
 const now=new Date();$('#sbBln').value=iso(now).slice(0,7);$('#dFrom').value=iso(new Date(now.getFullYear(),now.getMonth(),1));$('#dTo').value=iso(now);
 ['#taTgl','#gTgl-akun'].forEach(s=>$(s).value=iso(now));['#taJam','#gJam-akun'].forEach(s=>$(s).value=nowT());
 renderAll();renderGrid();
+/* ===== Date picker (range + single) ===== */
+(function(){
+const BLN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'],BS=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],HR=['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+const ymd=d=>d.toLocaleDateString('sv-SE'),P=x=>new Date(x+'T00:00:00'),T=()=>ymd(new Date()),AD=(x,n)=>{const d=P(x);d.setDate(d.getDate()+n);return ymd(d)};
+const lab=x=>{const d=P(x);return d.getDate()+' '+BS[d.getMonth()]+' '+d.getFullYear()};
+const PR={range:[
+ ['Hari Ini',()=>[T(),T()]],['Kemarin',()=>[AD(T(),-1),AD(T(),-1)]],
+ ['Bulan Ini',()=>{const n=new Date();return [ymd(new Date(n.getFullYear(),n.getMonth(),1)),T()]}],
+ ['Bulan Lalu',()=>{const n=new Date();return [ymd(new Date(n.getFullYear(),n.getMonth()-1,1)),ymd(new Date(n.getFullYear(),n.getMonth(),0))]}],
+ ['7 Hari Terakhir',()=>[AD(T(),-6),T()]],['30 Hari Terakhir',()=>[AD(T(),-29),T()]],['90 Hari Terakhir',()=>[AD(T(),-89),T()]]],
+ single:[['Hari Ini',()=>[T(),T()]],['Kemarin',()=>[AD(T(),-1),AD(T(),-1)]]]};
+const preName=(mode,a,b)=>{const r=PR[mode].find(p=>{const v=p[1]();return v[0]===a&&v[1]===b});return r?r[0]:''};
+const pop=document.createElement('div');pop.className='dpop';document.body.appendChild(pop);
+let C=null;
+const els={from:$('#dFrom'),to:$('#dTo')};
+function setVal(el,v){Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(el,v);widgets.forEach(w=>w.sync())}
+/* tombol */
+function mkBtn(anchor,mode,getAB,onApply){
+  const b=document.createElement('button');b.type='button';b.className='dpb';anchor.insertAdjacentElement('afterend',b);
+  const sync=()=>{const [x,y]=getAB();if(!x){b.textContent='📅 Pilih tanggal';return}
+    const n=preName(mode,x,y);b.innerHTML='📅 '+(n?'<em>'+n+'</em> · ':'')+(x===y?lab(x):lab(x)+' – '+lab(y))};
+  const o={btn:b,mode,getAB,onApply,sync};b.onclick=e=>{e.stopPropagation();C&&C.btn===b?close():open(o)};sync();return o;
+}
+const widgets=[];
+/* periode (range) */
+els.from.style.display=els.to.style.display='none';const sep=els.to.previousElementSibling;if(sep&&sep.classList.contains('note'))sep.style.display='none';
+widgets.push(mkBtn(els.to,'range',()=>[els.from.value,els.to.value],(a,b)=>{setVal(els.from,a);setVal(els.to,b);els.to.dispatchEvent(new Event('change',{bubbles:true}))}));
+/* tanggal tunggal */
+['#taTgl','#gTgl-akun'].forEach(sel=>{const el=$(sel);if(!el)return;el.style.display='none';
+  widgets.push(mkBtn(el,'single',()=>[el.value,el.value],a=>{setVal(el,a);el.dispatchEvent(new Event('change',{bubbles:true}));el.dispatchEvent(new Event('input',{bubbles:true}))}))});
+/* sinkron saat value diubah lewat kode */
+[els.from,els.to,$('#taTgl'),$('#gTgl-akun')].forEach(el=>{if(!el)return;const d=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value');
+  Object.defineProperty(el,'value',{configurable:true,get(){return d.get.call(this)},set(v){d.set.call(this,v);widgets.forEach(w=>w.sync())}})});
+widgets.forEach(w=>w.sync());
+
+function open(o){close();const [a,b]=o.getAB();C=Object.assign({},o,{a:a||T(),b:b||a||T(),pick:null,hover:null,view:null});
+  const d=P(C.a);C.view=new Date(d.getFullYear(),d.getMonth(),1);C.btn.classList.add('open');render();pop.classList.add('show');place()}
+function close(){if(C)C.btn.classList.remove('open');C=null;pop.classList.remove('show')}
+function place(){const r=C.btn.getBoundingClientRect(),sx=window.scrollX,sy=window.scrollY;pop.style.top=(r.bottom+sy+6)+'px';
+  const w=pop.offsetWidth;pop.style.left=Math.max(8+sx,Math.min(r.left+sx,window.innerWidth-w-8+sx))+'px'}
+function month(y,m,first,last,single){
+  const off=(new Date(y,m,1).getDay()+6)%7,n=new Date(y,m+1,0).getDate(),t=T();
+  let h='<div class="dpm"><div class="dph">'+((first||single)?'<button type="button" class="dpn l" data-nav="-1">←</button>':'')+BLN[m]+' '+y+((last||single)?'<button type="button" class="dpn r" data-nav="1">→</button>':'')+'</div><div class="dpg">'+HR.map(x=>'<span class="w">'+x+'</span>').join('');
+  for(let i=0;i<off;i++)h+='<span></span>';
+  for(let d=1;d<=n;d++){const x=ymd(new Date(y,m,d));h+='<button type="button" class="dpd'+(x===t?' td':'')+'" data-d="'+x+'">'+d+'</button>'}
+  return h+'</div></div>'}
+function render(){
+  const two=C.mode==='range'&&window.innerWidth>=700,v=C.view,y=v.getFullYear(),m=v.getMonth();
+  const [a,b]=[C.a,C.b],pre=PR[C.mode].map(p=>{const r=p[1](),on=r[0]===a&&r[1]===b&&!C.pick;return '<button type="button" data-pre="'+p[0]+'" class="'+(on?'on':'')+'">'+p[0]+'</button>'}).join('');
+  pop.innerHTML='<div class="dpp">'+pre+'</div><div class="dpr"><div class="dpc">'+(two?month(y,m,true,false)+month(m===11?y+1:y,(m+1)%12,false,true):month(y,m,true,true,true))+'</div><div class="dpf"></div></div>';
+  paint()}
+function paint(){
+  let s,e;if(C.mode==='range'){if(C.pick){s=C.pick;e=C.hover||C.pick;if(e<s)[s,e]=[e,s]}else{s=C.a;e=C.b}}else{s=e=C.a}
+  pop.querySelectorAll('.dpd').forEach(x=>{const d=x.dataset.d;x.classList.toggle('rs',d===s);x.classList.toggle('re',d===e);x.classList.toggle('in',d>=s&&d<=e&&s!==e)});
+  const f=pop.querySelector('.dpf');if(f)f.textContent=C.mode==='range'?(C.pick?'Pilih tanggal akhir…':(s===e?lab(s):lab(s)+' – '+lab(e))):lab(C.a)}
+function apply(a,b){const o=C;close();o.onApply(a,b)}
+pop.addEventListener('click',e=>{if(!C)return;
+  const pr=e.target.closest('[data-pre]');if(pr){const r=PR[C.mode].find(p=>p[0]===pr.dataset.pre)[1]();return apply(r[0],r[1])}
+  const nv=e.target.closest('[data-nav]');if(nv){C.view=new Date(C.view.getFullYear(),C.view.getMonth()+ +nv.dataset.nav,1);return render()}
+  const dd=e.target.closest('[data-d]');if(!dd)return;const x=dd.dataset.d;
+  if(C.mode==='single')return apply(x,x);
+  if(!C.pick){C.pick=x;C.hover=x;paint();render();return}
+  const p=C.pick;apply(p<x?p:x,p<x?x:p)});
+pop.addEventListener('mouseover',e=>{if(!C||!C.pick)return;const dd=e.target.closest('[data-d]');if(dd){C.hover=dd.dataset.d;paint()}});
+document.addEventListener('mousedown',e=>{if(C&&!pop.contains(e.target)&&!C.btn.contains(e.target))close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&C)close()});
+window.addEventListener('resize',()=>{if(C){render();place()}});
+})();
+
 if(S.url)pull(true);else setSt('sim','Mode lokal (belum terhubung)');
 </script>
 </body>
